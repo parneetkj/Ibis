@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import RegexValidator, MinLengthValidator, MaxLengthValidator
+from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
 
 # Create your models here.
 class Request(models.Model):
@@ -10,11 +10,11 @@ class Request(models.Model):
     availability = models.CharField(max_length=200, blank=False)
     amount = models.IntegerField(
         validators=[
-            MinLengthValidator(
+            MinValueValidator(
                 limit_value=1,
                 message="Must book at least 1 lesson."
             ),
-            MaxLengthValidator(
+            MaxValueValidator(
                 limit_value=50,
                 message="Cannot book more than 50 lessons."
             )
@@ -22,11 +22,11 @@ class Request(models.Model):
     )
     interval = models.IntegerField(
         validators=[
-            MinLengthValidator(
+            MinValueValidator(
                 limit_value=1,
                 message="Must book at least 1 week of lessons."
             ),
-            MaxLengthValidator(
+            MaxValueValidator(
                 limit_value=4,
                 message="Interval cannot be more than a month."
             )
@@ -44,10 +44,12 @@ class Request(models.Model):
     )
     topic = models.CharField(
         max_length=50,
-        default="Any"
+        default="Any",
+        blank=True
     )
     teacher = models.CharField(
         max_length=100,
-        default="Any"
+        default="Any",
+        blank=True
     )
     
