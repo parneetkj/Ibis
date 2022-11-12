@@ -1,0 +1,15 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+      <div class="col-xs-12 col-lg-6 col-xl-4">
+        <h3>Welcome</h3>
+          <form action="{% url 'new_request' %}" method="post">
+          {% csrf_token %}
+          {% include 'partials/bootstrap_form.html' with form=form %}
+          <button type="submit" class="btn btn-primary">Request</button>
+        </form>
+      </div>
+    </div>
+</div>
+{% endblock %}
