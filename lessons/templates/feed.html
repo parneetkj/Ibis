@@ -3,21 +3,20 @@
 <div class="container">
     <div class="row">
       <div class="col-xs-12 col-lg-6 col-xl-4">
-        <h3>Welcome</h3>
-          <form action="{% url 'new_request' %}" method="post">
+        <h1>Welcome</h1>
+        <form action="{% url 'new_request' %}" method="post">
           {% csrf_token %}
           {% include 'partials/bootstrap_form.html' with form=form %}
           <button type="submit" class="btn btn-primary">Request</button>
         </form>
       </div>
       <div class="col-xs-12 col-lg-6 col-xl-8">
-        <h1>Bookings</h1>
+        <h2>Bookings</h2>
         {% include 'partials/bookings_as_table.html' with bookings=bookings %}
         &nbsp;&middot;&nbsp;
-        <h1>Requests</h1>
+        <h2>Requests</h2>
         {% include 'partials/requests_as_table.html' with requests=requests %}
       </div>
-
     </div>
 </div>
 {% endblock %}

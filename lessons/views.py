@@ -26,6 +26,8 @@ def new_request(request):
             )
             return redirect('feed')
         else:
+            # To do - Does not render requests
             return render(request, 'feed.html', {'form': form})
+
     else:
         return HttpResponseForbidden
