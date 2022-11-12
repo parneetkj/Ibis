@@ -1,13 +1,15 @@
 from django.shortcuts import render, redirect
+from django.http import HttpResponseForbidden
 from .forms import RequestForm
 from .models import Request
-from django.http import HttpResponseForbidden
+from .helpers import get_requests
+
 
 # Create your views here.
 def feed(request):
     form = RequestForm()
-    # Needs to be filtered
-    requests = Request.objects.filter()
+    # Needs to be filtered by user
+    requests = get_requests(None)
     return render(request, 'feed.html', {'form' : form, 'requests' : requests})
 
 def new_request(request):
@@ -26,8 +28,9 @@ def new_request(request):
             )
             return redirect('feed')
         else:
-            # To do - Does not render requests
-            return render(request, 'feed.html', {'form': form})
+            # Needs to be filtered by user
+            requests = get_requests(None)
+            return render(request, 'feed.html', {'form': form, 'requests' : requests})
 
     else:
         return HttpResponseForbidden
