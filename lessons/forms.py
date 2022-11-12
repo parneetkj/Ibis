@@ -5,4 +5,4 @@ class RequestForm(forms.ModelForm):
 
     class Meta:
         model = Request
-        exclude = []
+        exclude = ['status']

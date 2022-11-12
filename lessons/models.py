@@ -52,4 +52,8 @@ class Request(models.Model):
         default="Any",
         blank=True
     )
+    status = models.CharField(
+        max_length=20,
+        default = "In Progress"
+    )
     
