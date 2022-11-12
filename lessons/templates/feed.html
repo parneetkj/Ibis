@@ -10,6 +10,14 @@
           <button type="submit" class="btn btn-primary">Request</button>
         </form>
       </div>
+      <div class="col-xs-12 col-lg-6 col-xl-8">
+        <h1>Bookings</h1>
+        {% include 'partials/bookings_as_table.html' with bookings=bookings %}
+        &nbsp;&middot;&nbsp;
+        <h1>Requests</h1>
+        {% include 'partials/requests_as_table.html' with requests=requests %}
+      </div>
+
     </div>
 </div>
 {% endblock %}

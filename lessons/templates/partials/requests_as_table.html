@@ -1,0 +1,5 @@
+<table class="table">
+    {% for request in requests %}
+    {% include 'partials/request_as_table_row.html' with request=request %}
+    {% endfor %}
+</table>

@@ -6,7 +6,9 @@ from django.http import HttpResponseForbidden
 # Create your views here.
 def feed(request):
     form = RequestForm()
-    return render(request, 'feed.html', {'form' : form})
+    # Needs to be filtered
+    requests = Request.objects.filter()
+    return render(request, 'feed.html', {'form' : form, 'requests' : requests})
 
 def new_request(request):
     if request.method == 'POST':
