@@ -15,7 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from lessons import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('feed/', views.feed, name='feed'),
+    path('new_request/', views.new_request, name='new_request'),
 ]
