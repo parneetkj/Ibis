@@ -87,7 +87,8 @@ class RequestTest(TestCase):
         self.request.topic = "X" * 101
         self._assert_request_is_invalid()
     
-
+    def test_status_is_in_progress_as_default(self):
+        self.assertEqual(self.request.status, "In Progress")
     
     def _assert_request_is_valid(self):
         try:

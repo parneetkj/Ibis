@@ -36,6 +36,10 @@ class SignUpFormTestCase(TestCase):
         self.assertTrue(isinstance(duration, forms.ChoiceField))
         self.assertIn('topic', form.fields)
         self.assertIn('teacher', form.fields)
+    
+    def test_form_does_not_have_status_field(self):
+        form = RequestForm()
+        self.assertNotIn('status', form.fields)
 
     def test_form_uses_model_validation(self):
         self.form_input['duration'] = 61
@@ -54,3 +58,4 @@ class SignUpFormTestCase(TestCase):
         self.assertEqual(request.duration, 30)
         self.assertEqual(request.topic, 'Violin')
         self.assertEqual(request.teacher, 'Mrs.Smith')
+        self.assertEqual(request.status, 'In Progress')
