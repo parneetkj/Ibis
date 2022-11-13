@@ -6,23 +6,8 @@
     <h1>Sign up</h1>
     <p>Sign Up Form:</p>
     <form action="{% url 'sign_up' %}" method="post">
-    {% crsf_token %}
-    
-    <label for="first_name">First name:</label>
-    <input id="first_name" type="text">
-    
-    <label for="last_name">Last name:</label>
-    <input id="last_name" type="text">
-  
-  	<label for="email">Email:</label>
-    <input id="email" type="email">
-    
-    <label for="password">Password:</label>
-    <input id="password" type="password">
-    
-    <label for="password_confimration">Password confirmation:</label>
-    <input id="password" type="password">
-    
+    {% csrf_token %}
+    {{ form }}
     <input type="submit" value="Sign up">
     </form>
   </body>
