@@ -34,3 +34,8 @@ def new_request(request):
 
     else:
         return HttpResponseForbidden
+    
+    
+    
+def sign_up(request):
+    return render(request, 'sign_up.html')
