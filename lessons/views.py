@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
 from .forms import RequestForm
+from .forms import SignUpForm
 from .models import Request
 from .helpers import get_requests
 
@@ -38,4 +39,5 @@ def new_request(request):
     
     
 def sign_up(request):
-    return render(request, 'sign_up.html')
+    form = SignUpForm()
+    return render(request, 'sign_up.html', {'form': form})
