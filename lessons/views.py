@@ -34,3 +34,8 @@ def new_request(request):
 
     else:
         return HttpResponseForbidden
+
+def booking(request):
+    form = RequestForm()
+    requests = get_requests(None)
+    return render(request, 'booking.html', {'form' : form, 'requests' : requests})
