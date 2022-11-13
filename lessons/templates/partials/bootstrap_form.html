@@ -1,0 +1,23 @@
+{% load widget_tweaks %}
+{% for field in form %}
+  <div class="form-floating mb-3">
+    {% if form.is_bound %}
+      {% if field.errors %}
+        {% render_field field class="form-control is-invalid" %}
+        <label for = render_field>{{ field.label_tag}}</label>
+      {% else %}
+        {% render_field field class="form-control is-valid" %}
+        <label for = render_field>{{ field.label_tag}}</label>
+      {% endif %}
+    {% else %}
+      {% render_field field class="form-control"%}
+      <label for = render_field>{{ field.label_tag}}</label>
+    {% endif %}
+    <div class="valid-feedback">
+      Looks good!
+    </div>
+    <div class="invalid-feedback">
+      {{ field.errors }}
+    </div>
+  </div>
+{% endfor %}

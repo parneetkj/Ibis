@@ -1,0 +1,32 @@
+<tr>
+    <td>
+        <p> Request ID: {{ request.id }} </p>
+        <p> Student: {{ request.student }} </p>
+        <p> Availability: {{ request.availability }} </p>
+        <p> Number of Lessons: {{ request.amount }} </p>
+        <p> Interval: {{ request.interval }} </p>
+        <p> Duration: {{ request.duration }} </p>
+        <p> Topic: {{ request.topic }} </p>
+        <p> Teacher: {{ request.teacher }} </p>
+        
+    </td>
+    <td style="width:40%">
+        {% if request.status == "In Progress"%}
+            <div class="alert alert-warning" role="alert">
+                {{request.status}}
+            </div>
+        {%elif request.status == "Accepted"%}
+            <div class="alert alert-success" role="alert">
+                {{request.status}}
+            </div>
+        {%else%}
+        <div class="alert alert-danger" role="alert">
+            {{request.status}}
+        </div>
+        {%endif%}
+
+        <button type="button" class="btn btn-primary">Edit Request</button>
+        <button type="button" class="btn btn-danger">Delete Request</button>
+    </td>
+
+</tr>
