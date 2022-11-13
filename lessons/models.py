@@ -61,4 +61,4 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique, blank=False)
-    bio = models.CharField(max_lenght=520, blank=True)
+    
