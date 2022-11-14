@@ -1,0 +1,5 @@
+<table class="table">
+    {% for booking in bookings %}
+    {% include 'partials/bookings_as_table_row.html' with booking=booking %}
+    {% endfor %}
+</table>
