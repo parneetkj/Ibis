@@ -60,5 +60,8 @@ class Request(models.Model):
 class User(AbstractUser):
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
-    email = models.EmailField(unique, blank=False)
-    
+    email = models.EmailField(unique=True, blank=False)
+        
+    def full_name(self):
+         return f'{self.first_name} {self.last_name}'
+
