@@ -1,14 +1,15 @@
-<html>
-<head> 
-  <title>Music Management School System</title> 
-</head>
-  <body>
-    <h1>Sign up</h1>
-    <p>Sign Up Form:</p>
-    <form action="{% url 'sign_up' %}" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Sign up">
-    </form>
-  </body>
-</html>
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Sign up</h1>
+      <form action="{% url 'sign_up' %}" method="post">
+        {% csrf_token %}
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        <input type="submit" value="Sign up" class="btn btn-primary">
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
