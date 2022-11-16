@@ -1,12 +1,14 @@
 from django.test import TestCase
 from ..models import Request
 from django.core.exceptions import ValidationError
+import datetime
 
 class RequestTest(TestCase):
     def setUp(self):
         self.request = Request(
             student="Tommy",
-            availability = "Monday's and Tuesday's between 3 and 7.",
+            date = '2022-12-12',
+            time = '20:20',
             amount=4,
             interval=1,
             duration=30,
@@ -22,12 +24,21 @@ class RequestTest(TestCase):
         self._assert_request_is_invalid()
 
 
-    def test_availability_should_not_be_blank(self):
-        self.request.availability = ""
+    def test_date_should_not_be_blank(self):
+        self.request.date = ""
         self._assert_request_is_invalid()
     
-    def test_availability_should_not_be_too_long(self):
-        self.request.availability = "X" * 201
+    def test_date_should_be_a_valid_date(self):
+        self.request.date = "4-20-08"
+        self._assert_request_is_invalid()
+
+
+    def test_time_should_not_be_blank(self):
+        self.request.time = ""
+        self._assert_request_is_invalid()
+
+    def test_time_should_be_a_valid_time(self):
+        self.request.date = "25:61"
         self._assert_request_is_invalid()
 
 

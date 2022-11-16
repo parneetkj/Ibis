@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
-from datetime import date
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
 # Create your models here.
@@ -10,14 +9,14 @@ class Request(models.Model):
 
     student = models.CharField(max_length=50, blank=False)
     
-    day = models.DateField(
+    date = models.DateField(
         blank=False,
-        default= timezone.now()
+        default= timezone.now().date()
     )
 
     time = models.TimeField(
         blank=False,
-        default= timezone.now()
+        default= timezone.now().time()
     )
     amount = models.IntegerField(
         validators=[
