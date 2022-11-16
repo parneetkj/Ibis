@@ -63,20 +63,11 @@ class Booking(models.Model):
 
     student = models.CharField(max_length=50, blank=False)
 
-    DAY_CHOICES = [
-    (0, 'Monday'),
-    (1, 'Tuesday'),
-    (2, 'Wednesday'),
-    (3, 'Thursday'),
-    (4, 'Friday'),
-    (5, 'Saturday'),
-    (6, 'Sunday'),
-    ]
-    day = models.IntegerField(choices=DAY_CHOICES, blank=False)
+    day = models.CharField(max_length=10, blank=False)
 
-    time = models.TimeField()
+    time = models.TimeField(blank=False)
 
-    start_date = models.DateTimeField()
+    start_date = models.DateField(blank=False)
 
     DURATION_CHOICES = [
     (15, '15 Minuite'),
@@ -86,10 +77,12 @@ class Booking(models.Model):
     ]
     duration = models.IntegerField(
     choices=DURATION_CHOICES,
-    default=30
+    default=30,
+    blank=False
     )
 
     interval = models.IntegerField(
+        blank=False,
         validators=[
             MinValueValidator(
                 limit_value=1,
@@ -104,10 +97,22 @@ class Booking(models.Model):
 
     teacher = models.CharField(
         max_length=100,
-        blank=True
+        blank=False
     )
 
-    no_of_lessons = models.IntegerField(default=1)
+    no_of_lessons = models.IntegerField(
+        blank=False,
+        validators=[
+            MinValueValidator(
+                limit_value=1,
+                message="Must book at least 1 lesson."
+            ),
+            MaxValueValidator(
+                limit_value=50,
+                message="Cannot book more than 50 lessons."
+            )
+        ]
+    )
 
     def generate_invoice():
         pass
