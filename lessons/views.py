@@ -3,6 +3,7 @@ from django.http import HttpResponseForbidden
 from .forms import RequestForm
 from .models import Request
 from .helpers import get_requests
+from django.contrib import messages
 
 
 # Create your views here.
@@ -34,3 +35,18 @@ def new_request(request):
 
     else:
         return HttpResponseForbidden
+
+
+def update_request(request, id):
+    lesson_request = Request.objects.get(pk=id)
+    if request.method == 'POST':
+        form = RequestForm(instance = lesson_request, data = request.POST)
+        if (form.is_valid()):
+            messages.add_message(request, messages.SUCCESS, "Request updated!")
+            form.save()
+            return redirect('feed')
+
+    form = RequestForm(instance = lesson_request)
+    return render(request, 'update_request.html', {'form': form, 'request' : lesson_request})
+
+            
