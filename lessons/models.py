@@ -63,7 +63,16 @@ class Booking(models.Model):
 
     student = models.CharField(max_length=50, blank=False)
 
-    day = models.CharField(max_length=10, blank=False)
+    DAY_CHOICES = [
+    (0, 'Monday'),
+    (1, 'Tuesday'),
+    (2, 'Wednesday'),
+    (3, 'Thursday'),
+    (4, 'Friday'),
+    (5, 'Saturday'),
+    (6, 'Sunday'),
+    ]
+    day = models.IntegerField(choices=DAY_CHOICES, blank=False)
 
     time = models.TimeField()
 
@@ -99,3 +108,6 @@ class Booking(models.Model):
     )
 
     no_of_lessons = models.IntegerField(default=1)
+
+    def generate_invoice():
+        pass
