@@ -19,6 +19,7 @@ from lessons import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('',views.home_page, name ='home_page'),
     path('feed/', views.feed, name='feed'),
     path('new_request/', views.new_request, name='new_request'),
 ]

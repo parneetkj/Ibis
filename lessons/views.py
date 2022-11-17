@@ -4,7 +4,8 @@ from .forms import RequestForm
 from .models import Request
 from .helpers import get_requests
 
-
+def home_page(request):
+    return render(request, 'home_page.html')
 # Create your views here.
 def feed(request):
     form = RequestForm()
