@@ -3,6 +3,11 @@ from django.http import HttpResponseForbidden
 from .forms import RequestForm
 from .models import Request
 from .helpers import get_requests
+from .models import User
+from .forms import SignUpForm
+from django.contrib.auth import login
+from django.contrib import messages
+
 
 def home_page(request):
     return render(request, 'home_page.html')
@@ -35,3 +40,16 @@ def new_request(request):
 
     else:
         return HttpResponseForbidden
+
+
+
+def sign_up(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('feed')
+    else:
+        form = SignUpForm()
+    return render(request, 'sign_up.html', {'form': form})

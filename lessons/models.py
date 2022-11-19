@@ -4,6 +4,15 @@ from django.core.validators import RegexValidator, MinValueValidator, MaxValueVa
 from django.db.models import TimeField, DateTimeField
 
 # Create your models here.
+
+
+
+class User(AbstractUser):
+    first_name = models.CharField(max_length=50, blank=False)
+    last_name = models.CharField(max_length=50, blank=False)
+    email = models.EmailField(unique=True, blank=False)
+
+    
 class Request(models.Model):
     """Requests by students"""
 
@@ -116,3 +125,5 @@ class Booking(models.Model):
 
     def generate_invoice():
         pass
+
+
