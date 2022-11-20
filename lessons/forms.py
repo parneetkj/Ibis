@@ -14,6 +14,17 @@ class RequestForm(forms.ModelForm):
         model = Request
         exclude = ['status']
 
+
+class LogInForm(forms.Form):
+    """Form enabling registered users to log in."""
+
+    email = forms.CharField(label="Email")
+    password = forms.CharField(label="Password", widget=forms.PasswordInput())
+
+
+
+
+
 class SignUpForm(forms.ModelForm):
     """Form enabling unregistered users to sign up."""
 

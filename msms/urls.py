@@ -23,4 +23,5 @@ urlpatterns = [
     path('feed/', views.feed, name='feed'),
     path('new_request/', views.new_request, name='new_request'),
     path('sign_up/', views.sign_up, name='sign_up'),
+    path('log_in/', views.log_in, name='log_in'),
 ]
