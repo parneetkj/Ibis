@@ -25,7 +25,7 @@ def new_request(request):
         form = RequestForm(request.POST)
         if form.is_valid():
             Request.objects.create(
-                student=form.cleaned_data.get('student'),
+                student=request.user,
                 date=form.cleaned_data.get('date'),
                 time=form.cleaned_data.get('time'),
                 amount=form.cleaned_data.get('amount'),

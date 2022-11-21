@@ -9,7 +9,7 @@ from django.core.validators import RegexValidator
 class RequestForm(forms.ModelForm):
     class Meta:
         model = Request
-        exclude = ['status']
+        exclude = ['student','status']
         def clean(self):
             super().clean()
             date = self.cleaned_data.get('date')
