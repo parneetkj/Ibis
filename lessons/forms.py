@@ -6,19 +6,18 @@ from django.core.validators import RegexValidator
 #from django.contrib.auth.forms import UserCreationForm
 #from django.contrib.auth.models import User
 
-
-
-
 class RequestForm(forms.ModelForm):
-
     class Meta:
         model = Request
         exclude = ['status']
         def clean(self):
             super().clean()
             date = self.cleaned_data.get('date')
-            if date <= datetime.date.today():
-                self.add_error('date','Date must be in the future.')
+            try:
+                if date <= datetime.date.today():
+                    self.add_error('date','Date must be in the future.')
+            except:
+                self.add_error('date','Date is in the wrong format.')
 
 class SignUpForm(forms.ModelForm):
     """Form enabling unregistered users to sign up."""

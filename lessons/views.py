@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
+from django.contrib.auth.decorators import login_required
 from .forms import RequestForm
 from .models import Request
 from .helpers import get_requests
@@ -12,15 +13,15 @@ from django.contrib import messages
 def home_page(request):
     return render(request, 'home_page.html')
 # Create your views here.
+@login_required
 def feed(request):
     form = RequestForm()
-    # Needs to be filtered by user
-    requests = get_requests(None)
+    requests = get_requests(request.user)
     return render(request, 'feed.html', {'form' : form, 'requests' : requests})
 
+@login_required
 def new_request(request):
     if request.method == 'POST':
-        #Should check for authenticated user
         form = RequestForm(request.POST)
         if form.is_valid():
             Request.objects.create(
@@ -35,14 +36,14 @@ def new_request(request):
             )
             return redirect('feed')
         else:
-            # Needs to be filtered by user
-            requests = get_requests(None)
+            requests = get_requests(request.user)
             return render(request, 'feed.html', {'form': form, 'requests' : requests})
 
     else:
         return HttpResponseForbidden
 
 
+@login_required
 def update_request(request, id):
     lesson_request = Request.objects.get(pk=id)
     if request.method == 'POST':
