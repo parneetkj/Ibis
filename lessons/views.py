@@ -46,8 +46,18 @@ def update_request(request, id):
             messages.add_message(request, messages.SUCCESS, "Request updated!")
             form.save()
             return redirect('feed')
+        else:
+            return render(request, 'update_request.html', {'form': form, 'request' : lesson_request})
+    else:
+        form = RequestForm(instance = lesson_request)
+        return render(request, 'update_request.html', {'form': form, 'request' : lesson_request})
+    
 
-    form = RequestForm(instance = lesson_request)
-    return render(request, 'update_request.html', {'form': form, 'request' : lesson_request})
-
-            
+def delete_request(request, id):
+    try:
+        Request.objects.filter(pk=id).delete()
+        messages.add_message(request, messages.SUCCESS, "Request deleted!")
+        return redirect('feed')
+    except:
+        messages.add_message(request, messages.SUCCESS, "Sorry, an error occurred deleting your request.")    
+        return redirect('feed')

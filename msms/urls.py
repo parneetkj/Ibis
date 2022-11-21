@@ -22,4 +22,5 @@ urlpatterns = [
     path('feed/', views.feed, name='feed'),
     path('new_request/', views.new_request, name='new_request'),
     path('update_request/<int:id>', views.update_request, name='update_request'),
+    path('delete_request/<int:id>', views.delete_request, name='delete_request'),
 ]
