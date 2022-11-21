@@ -20,7 +20,8 @@ def new_request(request):
         if form.is_valid():
             Request.objects.create(
                 student=form.cleaned_data.get('student'),
-                availability=form.cleaned_data.get('availability'),
+                date=form.cleaned_data.get('date'),
+                time=form.cleaned_data.get('time'),
                 amount=form.cleaned_data.get('amount'),
                 interval=form.cleaned_data.get('interval'),
                 duration=form.cleaned_data.get('duration'),
