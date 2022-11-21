@@ -1,0 +1,16 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+      <h1>New Booking</h1>
+      <div class="col-xs-12 col-lg-6 col-xl-4">
+        <h2>To Add->Request Information</h2>
+        <form action="{% url 'new_booking' %}" method="post">
+          {% csrf_token %}
+          {% include 'partials/bootstrap_form.html' with form=form %}
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </div>
+</div>
+{% endblock %}

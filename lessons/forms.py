@@ -1,6 +1,7 @@
 from django import forms
-from.models import Request
-from.models import User
+from .models import Request
+from .models import User
+from .models import Booking
 from django.core.validators import RegexValidator
 #from django.contrib.auth.forms import UserCreationForm
 #from django.contrib.auth.models import User
@@ -14,6 +15,12 @@ class RequestForm(forms.ModelForm):
         model = Request
         exclude = ['status']
 
+class BookingForm(forms.ModelForm):
+
+    class Meta:
+        model = Booking
+        exclude = ['status']
+
 class SignUpForm(forms.ModelForm):
     """Form enabling unregistered users to sign up."""
 
@@ -22,7 +29,7 @@ class SignUpForm(forms.ModelForm):
 
         model = User
         fields = ['first_name','last_name','email']
-        
+
 
     new_password = forms.CharField(
         label='Password',

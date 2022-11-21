@@ -23,4 +23,6 @@ urlpatterns = [
     path('feed/', views.feed, name='feed'),
     path('new_request/', views.new_request, name='new_request'),
     path('sign_up/', views.sign_up, name='sign_up'),
+    path('pending_requests/', views.pending_requests, name='pending_requests'),
+    path('new_booking/', views.new_booking, name='new_booking'),
 ]

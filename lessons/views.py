@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
-from .forms import RequestForm
+from .forms import RequestForm, BookingForm
 from .models import Request
 from .helpers import get_requests
 from .models import User
@@ -41,8 +41,6 @@ def new_request(request):
     else:
         return HttpResponseForbidden
 
-
-
 def sign_up(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -53,3 +51,19 @@ def sign_up(request):
     else:
         form = SignUpForm()
     return render(request, 'sign_up.html', {'form': form})
+
+def pending_requests(request):
+    form = RequestForm()
+    # Needs to be filtered by user
+    requests = get_requests(None)
+    return render(request, 'pending_requests.html', {'form' : form, 'requests' : requests})
+
+def new_booking(request):
+    if request.method == 'POST':
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            booking = form.save()
+            return redirect('feed')
+    else:
+        form = BookingForm(request.POST)
+    return render(request, 'new_booking.html', {'form': form})

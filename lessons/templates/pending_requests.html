@@ -1,0 +1,11 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+      <h1>Pending</h1>
+      <div class="col-xs-12 col-lg-6 col-xl-4">
+        {% include 'partials/pending_requests_as_table.html' with requests=requests %}
+      </div>
+    </div>
+</div>
+{% endblock %}
