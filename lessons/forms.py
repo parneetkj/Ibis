@@ -15,10 +15,10 @@ class RequestForm(forms.ModelForm):
         model = Request
         exclude = ['status']
         def clean(self):
-        super().clean()
-        date = self.cleaned_data.get('date')
-        if date <= datetime.date.today():
-            self.add_error('date','Date must be in the future.')
+            super().clean()
+            date = self.cleaned_data.get('date')
+            if date <= datetime.date.today():
+                self.add_error('date','Date must be in the future.')
 
 class SignUpForm(forms.ModelForm):
     """Form enabling unregistered users to sign up."""
