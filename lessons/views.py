@@ -62,25 +62,24 @@ def pending_requests(request):
     return render(request, 'pending_requests.html', {'form' : form, 'requests' : requests})
 
 def new_booking(request, request_id):
-    try:
-        form = BookingForm(request.POST)
-        pending_request = Request.objects.get(id=request_id)
-
+    pending_request = Request.objects.get(id=request_id)
+    if request.method == 'POST':
+        form = BookingForm(instance = pending_request, data = request.POST)
         if form.is_valid():
             Booking.objects.create(
-            student=form.cleaned_data.get('student'),
-            day=form.cleaned_data.get('day'),
-            time=form.cleaned_data.get('time'),
-            start_date=form.cleaned_data.get('start_date'),
-            duration=form.cleaned_data.get('duration'),
-            interval=form.cleaned_data.get('interval'),
-            teacher=form.cleaned_data.get('teacher'),
-            no_of_lessons=form.cleaned_data.get('no_of_lessons'),
+                student=form.cleaned_data.get('student'),
+                day=form.cleaned_data.get('day'),
+                time=form.cleaned_data.get('time'),
+                start_date=form.cleaned_data.get('start_date'),
+                duration=form.cleaned_data.get('duration'),
+                interval=form.cleaned_data.get('interval'),
+                teacher=form.cleaned_data.get('teacher'),
+                no_of_lessons=form.cleaned_data.get('no_of_lessons'),
             )
             Request.objects.filter(id=request_id).delete()
             return redirect('feed')
-
-    except ObjectDoesNotExist:
-        return redirect('pending_requests')
+        else:
+            return render(request, 'new_booking.html', {'form': form, 'request': pending_request})
     else:
-        return render(request, 'new_booking.html', {'form': form, 'pending_request': pending_request})
+        form = BookingForm(instance = pending_request)
+        return render(request, 'new_booking.html', {'form': form, 'request' : pending_request})
