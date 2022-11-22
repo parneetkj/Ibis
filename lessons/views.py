@@ -1,5 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponseForbidden
+from django.shortcuts import redirect, render
 from .forms import RequestForm
 from .models import Request
 from .helpers import get_requests
@@ -56,6 +60,7 @@ def log_in(request):
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form})
+
 
 def sign_up(request):
     if request.method == 'POST':

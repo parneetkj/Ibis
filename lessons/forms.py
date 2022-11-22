@@ -23,8 +23,6 @@ class LogInForm(forms.Form):
 
 
 
-
-
 class SignUpForm(forms.ModelForm):
     """Form enabling unregistered users to sign up."""
 
@@ -32,8 +30,7 @@ class SignUpForm(forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['first_name','last_name','email']
-        
+        fields = ['first_name', 'last_name', 'username', 'email']
 
     new_password = forms.CharField(
         label='Password',
@@ -60,6 +57,7 @@ class SignUpForm(forms.ModelForm):
 
         super().save(commit=False)
         user = User.objects.create_user(
+            self.cleaned_data.get('username'),
             first_name=self.cleaned_data.get('first_name'),
             last_name=self.cleaned_data.get('last_name'),
             email=self.cleaned_data.get('email'),
