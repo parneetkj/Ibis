@@ -12,7 +12,7 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
 
-    
+
 class Request(models.Model):
     """Requests by students"""
 
@@ -125,5 +125,3 @@ class Booking(models.Model):
 
     def generate_invoice():
         pass
-
-
