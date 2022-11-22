@@ -1,10 +1,15 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponseForbidden
+from django.shortcuts import redirect, render
 from .forms import RequestForm
 from .models import Request
 from .helpers import get_requests
 from .models import User
 from .forms import SignUpForm
+from .forms import LogInForm
 from django.contrib.auth import login
 from django.contrib import messages
 
@@ -41,6 +46,20 @@ def new_request(request):
     else:
         return HttpResponseForbidden
 
+
+def log_in(request):
+    if request.method == 'POST':
+        form = LogInForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            password = form.cleaned_data.get('password')
+            user = authenticate(email=email, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('feed')
+        messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
+    form = LogInForm()
+    return render(request, 'log_in.html', {'form': form})
 
 
 def sign_up(request):
