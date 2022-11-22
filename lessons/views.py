@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
 from .forms import RequestForm, BookingForm
-from .models import Request
+from .models import Request, Booking
 from .helpers import get_requests
 from .models import User
 from .forms import SignUpForm
 from django.contrib.auth import login
 from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def home_page(request):
@@ -16,7 +17,8 @@ def feed(request):
     form = RequestForm()
     # Needs to be filtered by user
     requests = get_requests(None)
-    return render(request, 'feed.html', {'form' : form, 'requests' : requests})
+    bookings = Booking.objects.all()
+    return render(request, 'feed.html', {'form' : form, 'requests' : requests, 'bookings' : bookings})
 
 def new_request(request):
     if request.method == 'POST':
@@ -58,12 +60,26 @@ def pending_requests(request):
     requests = get_requests(None)
     return render(request, 'pending_requests.html', {'form' : form, 'requests' : requests})
 
-def new_booking(request):
-    if request.method == 'POST':
+def new_booking(request, request_id):
+    try:
         form = BookingForm(request.POST)
+        pending_request = Request.objects.get(id=request_id)
+
         if form.is_valid():
-            booking = form.save()
+            Booking.objects.create(
+            student=form.cleaned_data.get('student'),
+            day=form.cleaned_data.get('day'),
+            time=form.cleaned_data.get('time'),
+            start_date=form.cleaned_data.get('start_date'),
+            duration=form.cleaned_data.get('duration'),
+            interval=form.cleaned_data.get('interval'),
+            teacher=form.cleaned_data.get('teacher'),
+            no_of_lessons=form.cleaned_data.get('no_of_lessons'),
+            )
+            Request.objects.filter(id=request_id).delete()
             return redirect('feed')
+
+    except ObjectDoesNotExist:
+        return redirect('pending_requests')
     else:
-        form = BookingForm(request.POST)
-    return render(request, 'new_booking.html', {'form': form})
+        return render(request, 'new_booking.html', {'form': form, 'pending_request': pending_request})
