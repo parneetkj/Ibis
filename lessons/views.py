@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
 from .forms import RequestForm, BookingForm
 from .models import Request, Booking
-from .helpers import get_requests
+from .helpers import get_requests, get_bookings
 from .models import User
 from .forms import SignUpForm
 from django.contrib.auth import login
@@ -17,7 +17,8 @@ def feed(request):
     form = RequestForm()
     # Needs to be filtered by user
     requests = get_requests(None)
-    bookings = Booking.objects.all()
+    bookings = get_bookings(None)
+
     return render(request, 'feed.html', {'form' : form, 'requests' : requests, 'bookings' : bookings})
 
 def new_request(request):
