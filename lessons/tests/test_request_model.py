@@ -1,12 +1,17 @@
 from django.test import TestCase
-from ..models import Request
+from ..models import Request, User
 from django.core.exceptions import ValidationError
 import datetime
 
+
 class RequestTest(TestCase):
+    fixtures = [
+        'lessons/tests/fixtures/default_user.json',
+    ]
     def setUp(self):
+        self.user = User.objects.get(username='@johndoe')
         self.request = Request(
-            student="Tommy",
+            student=self.user,
             date = '2022-12-12',
             time = '20:20',
             amount=4,
