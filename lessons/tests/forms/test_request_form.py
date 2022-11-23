@@ -1,7 +1,7 @@
 from django import forms
 from django.test import TestCase
-from ..forms import RequestForm
-from ..models import Request, User
+from ...forms import RequestForm
+from ...models import Request, User
 import datetime
 
 class SignUpFormTestCase(TestCase):

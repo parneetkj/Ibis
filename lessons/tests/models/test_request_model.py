@@ -1,5 +1,5 @@
 from django.test import TestCase
-from ..models import Request, User
+from ...models import Request, User
 from django.core.exceptions import ValidationError
 import datetime
 
