@@ -6,7 +6,8 @@ from .models import Request
 from .helpers import get_requests
 from .models import User
 from .forms import SignUpForm
-from django.contrib.auth import login
+from .forms import LogInForm
+from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 
 
@@ -58,6 +59,20 @@ def update_request(request, id):
         form = RequestForm(instance = lesson_request)
         return render(request, 'update_request.html', {'form': form, 'request' : lesson_request})
     
+def log_in(request):
+    if request.method == 'POST':
+        form = LogInForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            password = form.cleaned_data.get('password')
+            user = authenticate(email=email, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('feed')
+        messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
+    form = LogInForm()
+    return render(request, 'log_in.html', {'form': form})
+
 
 def delete_request(request, id):
     try:
