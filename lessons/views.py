@@ -1,14 +1,12 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
-from .forms import RequestForm, BookingForm
-from .models import Request, Booking
+from .models import User, Request, Booking
 from .helpers import get_requests, get_bookings
-from .models import User
-from .forms import SignUpForm
-from django.contrib.auth import login
 from django.contrib import messages
-from django.core.exceptions import ObjectDoesNotExist
-
+from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponseForbidden
+from django.shortcuts import redirect, render
+from .forms import SignUpForm, LogInForm, RequestForm, BookingForm
 
 def home_page(request):
     return render(request, 'home_page.html')
@@ -43,6 +41,22 @@ def new_request(request):
 
     else:
         return HttpResponseForbidden
+
+
+def log_in(request):
+    if request.method == 'POST':
+        form = LogInForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            password = form.cleaned_data.get('password')
+            user = authenticate(email=email, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('feed')
+        messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
+    form = LogInForm()
+    return render(request, 'log_in.html', {'form': form})
+
 
 def sign_up(request):
     if request.method == 'POST':

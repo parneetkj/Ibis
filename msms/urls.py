@@ -25,4 +25,5 @@ urlpatterns = [
     path('sign_up/', views.sign_up, name='sign_up'),
     path('pending_requests/', views.pending_requests, name='pending_requests'),
     path('new_booking/<int:request_id>', views.new_booking, name='new_booking'),
+    path('log_in/', views.log_in, name='log_in'),
 ]
