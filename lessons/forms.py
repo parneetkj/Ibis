@@ -1,18 +1,34 @@
 from django import forms
 from.models import Request
+import datetime
+from django.utils import timezone
 from.models import User
 from django.core.validators import RegexValidator
 #from django.contrib.auth.forms import UserCreationForm
 #from django.contrib.auth.models import User
 
-
-
-
 class RequestForm(forms.ModelForm):
-
     class Meta:
         model = Request
-        exclude = ['status']
+        exclude = ['student','status']
+    
+    """Override clean method to check date and time"""
+    def clean(self):
+        super().clean()
+        date = self.cleaned_data.get('date')
+        if(date <= timezone.now().date()):
+            self.add_error('date','Date must be in the future.')
+            time = self.cleaned_data.get('time')
+            if (date == timezone.now().date() and time <= timezone.now().time()):
+                self.add_error('time','Time must be in the future.')
+
+class LogInForm(forms.Form):
+    """Form enabling registered users to log in."""
+
+    email = forms.CharField(label="Email")
+    password = forms.CharField(label="Password", widget=forms.PasswordInput())
+
+
 
 
 class LogInForm(forms.Form):
