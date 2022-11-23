@@ -7,8 +7,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseForbidden
 # Create your models here.
 
-
-
 class User(AbstractUser):
 
     username = models.CharField(
