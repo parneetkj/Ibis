@@ -39,7 +39,6 @@ def new_request(request):
         else:
             requests = get_requests(request.user)
             return render(request, 'feed.html', {'form': form, 'requests' : requests})
-
     else:
         return HttpResponseForbidden
 
@@ -61,20 +60,21 @@ def update_request(request, id):
     
 def log_in(request):
     if request.method == 'POST':
-        next = request.POST.get('next') or 'feed'
         form = LogInForm(request.POST)
+        next = request.POST.get('next') or ''
         if form.is_valid():
             email = form.cleaned_data.get('email')
             password = form.cleaned_data.get('password')
             user = authenticate(email=email, password=password)
             if user is not None:
                 login(request, user)
-                return redirect(next)
+                redirect_url = next or 'feed'
+                return redirect(redirect_url)
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
-    elif request.method == 'GET':
+    else:
         next = request.GET.get('next') or ''
-        form = LogInForm()
-        return render(request, 'log_in.html', {'form': form, 'next' : next})
+    form = LogInForm()
+    return render(request, 'log_in.html', {'form': form, 'next': next})
     
 def delete_request(request, id):
     try:
@@ -95,3 +95,7 @@ def sign_up(request):
     else:
         form = SignUpForm()
     return render(request, 'sign_up.html', {'form': form})
+
+def log_out(request):
+    logout(request)
+    return redirect('home_page')
