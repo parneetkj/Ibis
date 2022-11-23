@@ -98,9 +98,9 @@ class Booking(models.Model):
     start_date = models.DateField(blank=False)
 
     DURATION_CHOICES = [
-    (15, '15 Minuite'),
-    (30, '30 Minuite'),
-    (45, '45 Minuite'),
+    (15, '15 Minute'),
+    (30, '30 Minute'),
+    (45, '45 Minute'),
     (60, '1 Hour'),
     ]
     duration = models.IntegerField(

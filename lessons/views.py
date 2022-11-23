@@ -10,10 +10,10 @@ from .forms import LogInForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 
-
+# Create your views here.
 def home_page(request):
     return render(request, 'home_page.html')
-# Create your views here.
+
 @login_required
 def feed(request):
     form = RequestForm()
@@ -61,6 +61,7 @@ def update_request(request, id):
     
 def log_in(request):
     if request.method == 'POST':
+        next = request.POST.get('next') or 'feed'
         form = LogInForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data.get('email')
@@ -68,12 +69,13 @@ def log_in(request):
             user = authenticate(email=email, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('feed')
+                return redirect(next)
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
-    form = LogInForm()
-    return render(request, 'log_in.html', {'form': form})
-
-
+    elif request.method == 'GET':
+        next = request.GET.get('next') or ''
+        form = LogInForm()
+        return render(request, 'log_in.html', {'form': form, 'next' : next})
+    
 def delete_request(request, id):
     try:
         Request.objects.filter(pk=id).delete()
@@ -82,8 +84,6 @@ def delete_request(request, id):
     except:
         messages.add_message(request, messages.SUCCESS, "Sorry, an error occurred deleting your request.")    
         return redirect('feed')
-
-
 
 def sign_up(request):
     if request.method == 'POST':
