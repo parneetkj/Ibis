@@ -1,0 +1,11 @@
+[
+  {
+    "model": "lessons.user",
+    "pk": 1,
+    "fields": {
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "johndoe@example.org"
+    }
+  }
+]

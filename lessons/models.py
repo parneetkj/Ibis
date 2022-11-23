@@ -70,7 +70,7 @@ class Request(models.Model):
 class Booking(models.Model):
     """ Booking by admin """
 
-    student = models.CharField(max_length=50, blank=False)
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
 
     day = models.CharField(max_length=10, blank=False)
 

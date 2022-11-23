@@ -1,15 +1,19 @@
 from django import forms
 from django.test import TestCase
 from ..forms import BookingForm
-from ..models import Booking
+from ..models import Booking, User
 import datetime
 
 class BookingTestCase(TestCase):
     """Unit tests of the booking form."""
 
+    fixtures = ['lessons/tests/fixtures/default_user.json']
+
     def setUp(self):
+        self.user = User.objects.get(email='johndoe@example.org')
+
         self.form_input = {
-            'student':'Tommy',
+            'student':self.user,
             'day':'Monday',
             'time':'14:30',
             'start_date':'2022-11-16',
@@ -51,7 +55,7 @@ class BookingTestCase(TestCase):
         form.save()
         after_count = Booking.objects.count()
         self.assertEqual(after_count, before_count+1)
-        booking = Booking.objects.get(student="Tommy")
+        booking = Booking.objects.get(student=self.user)
         self.assertEqual(booking.day, "Monday")
         self.assertEqual(booking.time, datetime.time(14, 30))
         self.assertEqual(booking.start_date, datetime.date(2022, 11, 16))

@@ -1,13 +1,18 @@
 """Unit tests of the Booking model."""
 from django.test import TestCase
-from ..models import Booking
+from ..models import Booking, User
 from django.core.exceptions import ValidationError
 
 class BookingTest(TestCase):
     """Unit tests of the Booking model."""
+
+    fixtures = ['lessons/tests/fixtures/default_user.json']
+
     def setUp(self):
+        self.user = User.objects.get(email='johndoe@example.org')
+
         self.booking = Booking(
-            student="Tommy",
+            student=self.user,
             day="Monday",
             time="14:30",
             start_date="2022-11-16",
@@ -21,7 +26,7 @@ class BookingTest(TestCase):
         self._assert_booking_is_valid()
 
     def test_student_should_not_be_blank(self):
-        self.booking.student = ""
+        self.booking.student = None
         self._assert_booking_is_invalid()
 
     def test_day_should_not_be_blank(self):
