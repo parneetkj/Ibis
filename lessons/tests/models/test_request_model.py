@@ -12,7 +12,7 @@ class RequestTest(TestCase):
         self.user = User.objects.get(username='@johndoe')
         self.request = Request(
             student=self.user,
-            date = '2022-12-12',
+            date = '2023-12-12',
             time = '20:20',
             amount=4,
             interval=1,

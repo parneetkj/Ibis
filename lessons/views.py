@@ -45,7 +45,12 @@ def new_request(request):
 
 @login_required
 def update_request(request, id):
-    lesson_request = Request.objects.get(pk=id)
+    try:
+        lesson_request = Request.objects.get(pk=id)
+    except:
+        messages.add_message(request, messages.ERROR, "Request could not be found!")
+        return redirect('feed')
+        
     if request.method == 'POST':
         form = RequestForm(instance = lesson_request, data = request.POST)
         if (form.is_valid()):
@@ -75,14 +80,15 @@ def log_in(request):
         next = request.GET.get('next') or ''
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form, 'next': next})
-    
+
+@login_required
 def delete_request(request, id):
-    try:
+    if (Request.objects.filter(pk=id)):
         Request.objects.filter(pk=id).delete()
         messages.add_message(request, messages.SUCCESS, "Request deleted!")
         return redirect('feed')
-    except:
-        messages.add_message(request, messages.SUCCESS, "Sorry, an error occurred deleting your request.")    
+    else:
+        messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")    
         return redirect('feed')
 
 def sign_up(request):
