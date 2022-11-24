@@ -11,7 +11,7 @@ class RequestForm(forms.ModelForm):
     class Meta:
         model = Request
         exclude = ['student','status']
-    
+
     """Override clean method to check date and time"""
     def clean(self):
         super().clean()
@@ -46,12 +46,9 @@ class SignUpForm(forms.ModelForm):
         """Form options."""
 
         model = User
-<<<<<<< HEAD
-        fields = ['first_name','last_name','email']
 
-=======
         fields = ['first_name', 'last_name', 'username', 'email']
->>>>>>> main
+
 
     new_password = forms.CharField(
         label='Password',
@@ -78,7 +75,7 @@ class SignUpForm(forms.ModelForm):
 
         super().save(commit=False)
         user = User.objects.create_user(
-            self.cleaned_data.get('username'),
+            self.cleaned_data.get('email'),
             first_name=self.cleaned_data.get('first_name'),
             last_name=self.cleaned_data.get('last_name'),
             email=self.cleaned_data.get('email'),

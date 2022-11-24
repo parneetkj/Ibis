@@ -11,13 +11,15 @@ from .forms import LogInForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 
+from .decorators import student_required
+
 
 # Create your views here.
 def home_page(request):
     return render(request, 'home_page.html')
 
 @login_required
-
+@student_required
 def feed(request):
     form = RequestForm()
     requests = get_requests(request.user)
@@ -73,7 +75,7 @@ def log_in(request):
         if form.is_valid():
             email = form.cleaned_data.get('email')
             password = form.cleaned_data.get('password')
-            user = authenticate(email=email, password=password)
+            user = authenticate(username=email, password=password)
             if user is not None:
                 login(request, user)
                 redirect_url = next or 'feed'
@@ -104,10 +106,7 @@ def sign_up(request):
     else:
         form = SignUpForm()
     return render(request, 'sign_up.html', {'form': form})
-<<<<<<< HEAD
-=======
 
 def log_out(request):
     logout(request)
     return redirect('home_page')
->>>>>>> main
