@@ -2,16 +2,13 @@
 from django.test import TestCase, RequestFactory
 from lessons.models import User
 from lessons.views import feed
+from django.contrib.auth.models import AnonymousUser
 
 class AnonymousUserTestCase(TestCase):
-    def setUp(self):
-        self.factory = RequestFactory()
-        self.user = AnonymousUser()
+
 
     def access_feed_page(self):
-        request = self.factory.get('/feed')
-        request.user = AnonymousUser()
-        response = feed(request)
+        response = self.client.get(reverse("feed"))
         self.assertEqual(response.status_code, 302)
 
 

@@ -46,7 +46,7 @@ class UpdateRequestViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'feed.html')
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 1)
-    
+
     def test_update_correctly_saves(self):
         self.client.login(username=self.user.username, password='Password123')
         request_url = reverse('update_request', kwargs={'id': self.requests[0].pk})
