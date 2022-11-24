@@ -32,7 +32,7 @@ class NewBookingViewTestCase(TestCase):
         self.assertEqual(self.url,f'/new_booking/{self.target_request.id}')
 
     def test_get_new_booking(self):
-        #self.client.login(username=self.user.username, password='Password123')
+        self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'new_booking.html')
@@ -55,7 +55,7 @@ class NewBookingViewTestCase(TestCase):
         self.assertEqual(len(messages_list), 1)
     
     def test_booking_correctly_saves(self):
-        #self.client.login(username=self.user.username, password='Password123')
+        self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'new_booking.html')

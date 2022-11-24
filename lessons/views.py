@@ -103,14 +103,14 @@ def log_out(request):
     logout(request)
     return redirect('home_page')
 
-
+@login_required
 def pending_requests(request):
     form = RequestForm()
     # Needs to be filtered to only be viewed by admin
     requests = requests = Request.objects.filter()
     return render(request, 'pending_requests.html', {'form' : form, 'requests' : requests})
 
-
+@login_required
 def new_booking(request, request_id):
     #pending_request = Request.objects.get(id=request_id)
     try:
@@ -139,7 +139,7 @@ def new_booking(request, request_id):
         form = BookingForm(instance = pending_request)
         return render(request, 'new_booking.html', {'form': form, 'request' : pending_request})
 
-
+@login_required
 def bookings(request):
     # Edit to make admins see all and user see there own bookings
     if request.user.is_superuser:
