@@ -1,7 +1,7 @@
 from django import forms
 from django.test import TestCase
-from ..forms import BookingForm
-from ..models import Booking, User
+from ...forms import BookingForm
+from ...models import Booking, User
 import datetime
 
 class BookingTestCase(TestCase):

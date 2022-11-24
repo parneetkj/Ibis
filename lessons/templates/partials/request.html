@@ -1,14 +1,10 @@
-<div class="row content">
-  <div class="col-12">
-    <div class="profile-text">
-      <h3>Student Requested: </h3>
-      <p> Student: {{ request.student }} </p>
-      <p> Availability: {{ request.availability }} </p>
-      <p> Number of Lessons: {{ request.amount }} </p>
-      <p> Interval: {{ request.interval }} </p>
-      <p> Duration: {{ request.duration }} </p>
-      <p> Topic: {{ request.topic }} </p>
-      <p> Teacher: {{ request.teacher }} </p>
-    </div>
-  </div>
+<div>
+  <h3>Student Requested: </h3>
+  <p class="lead"> 
+    <b>{{ request.student }}</b> has requested a lesson on <b>{{ request.date }}</b> at <b>{{ request.time }}</b>. 
+    They would like <b>{{ request.amount }}</b> lessons every <b>{{ request.interval }}</b> weeks. 
+    They would like their lessons to be <b>{{ request.duration }}</b> minutes long. 
+    They would like to learn <b>{{ request.topic }}</b> with <b>{{ request.teacher }}</b> teacher.
+  </p>
 </div>
+

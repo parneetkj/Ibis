@@ -2,11 +2,11 @@
 {% block content %}
 <div class="container">
     <div class="row">
-      <h1>Bookings: </h1>
-      <div class="col-xs-12 col-lg-6 col-xl-8">
-        {% include 'partials/bookings_as_table.html' with bookings=bookings %}
-        &nbsp;&nbsp;
-      </div>
+        <h1>Bookings: </h1>
+        <div>
+            {% include 'partials/bookings_as_table.html' with bookings=bookings %}
+            &nbsp;&nbsp;
+        </div>
     </div>
 </div>
 {% endblock %}

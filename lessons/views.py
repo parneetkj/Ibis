@@ -67,7 +67,7 @@ def log_in(request):
         if form.is_valid():
             email = form.cleaned_data.get('email')
             password = form.cleaned_data.get('password')
-            user = authenticate(email=email, password=password)
+            user = authenticate(username=email, password=password)
             if user is not None:
                 login(request, user)
                 redirect_url = next or 'feed'
@@ -115,7 +115,7 @@ def new_booking(request, request_id):
         form = BookingForm(instance = pending_request, data = request.POST)
         if form.is_valid():
             Booking.objects.create(
-                student=form.cleaned_data.get('student'),
+                student=request.user,
                 day=form.cleaned_data.get('day'),
                 time=form.cleaned_data.get('time'),
                 start_date=form.cleaned_data.get('start_date'),
@@ -134,5 +134,10 @@ def new_booking(request, request_id):
 
 def bookings(request):
     # Edit to make admins see all and user see there own bookings
+    if request.user.is_superuser:
+        pass
+    else:
+        messages.add_message(request, messages.INFO, "To edit or delete your bookings please contact your school administrator")
+    
     bookings = get_users_bookings(request.user)
     return render(request, 'bookings.html', {'bookings' : bookings})
