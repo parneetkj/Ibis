@@ -103,14 +103,21 @@ def log_out(request):
     logout(request)
     return redirect('home_page')
 
+
 def pending_requests(request):
     form = RequestForm()
-    # Needs to be filtered by user
+    # Needs to be filtered to only be viewed by admin
     requests = requests = Request.objects.filter()
     return render(request, 'pending_requests.html', {'form' : form, 'requests' : requests})
 
+
 def new_booking(request, request_id):
-    pending_request = Request.objects.get(id=request_id)
+    #pending_request = Request.objects.get(id=request_id)
+    try:
+        pending_request = Request.objects.get(id=request_id)
+    except:
+        messages.add_message(request, messages.ERROR, "Request could not be found!")
+        return redirect('feed')
     if request.method == 'POST':
         form = BookingForm(instance = pending_request, data = request.POST)
         if form.is_valid():
@@ -131,6 +138,7 @@ def new_booking(request, request_id):
     else:
         form = BookingForm(instance = pending_request)
         return render(request, 'new_booking.html', {'form': form, 'request' : pending_request})
+
 
 def bookings(request):
     # Edit to make admins see all and user see there own bookings
