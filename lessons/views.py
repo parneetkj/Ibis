@@ -108,7 +108,7 @@ def log_out(request):
 def pending_requests(request):
     form = RequestForm()
     # Needs to be filtered by user
-    requests = get_requests(None)
+    requests = requests = Request.objects.filter()
     return render(request, 'pending_requests.html', {'form' : form, 'requests' : requests})
 
 def new_booking(request, request_id):
