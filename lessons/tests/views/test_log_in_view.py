@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 from lessons.forms import LogInForm
 from lessons.models import User
-from .helpers import LogInTester
+from lessons.tests.helpers import LogInTester
 
 class LogInViewTestCase(TestCase, LogInTester):
     """Tests of the log in view."""

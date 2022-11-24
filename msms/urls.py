@@ -22,8 +22,11 @@ urlpatterns = [
     path('',views.home_page, name ='home_page'),
     path('feed/', views.feed, name='feed'),
     path('new_request/', views.new_request, name='new_request'),
+    path('update_request/<int:id>', views.update_request, name='update_request'),
+    path('delete_request/<int:id>', views.delete_request, name='delete_request'),
     path('sign_up/', views.sign_up, name='sign_up'),
     path('pending_requests/', views.pending_requests, name='pending_requests'),
     path('new_booking/<int:request_id>', views.new_booking, name='new_booking'),
     path('log_in/', views.log_in, name='log_in'),
+    path('log_out/', views.log_out, name='log_out'),
 ]

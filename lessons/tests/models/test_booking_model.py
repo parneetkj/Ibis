@@ -1,6 +1,6 @@
 """Unit tests of the Booking model."""
 from django.test import TestCase
-from ..models import Booking, User
+from ...models import Booking, User
 from django.core.exceptions import ValidationError
 
 class BookingTest(TestCase):
