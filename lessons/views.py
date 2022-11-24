@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
 from .models import User, Request, Booking
-from .helpers import get_requests, get_bookings
+from .helpers import get_requests, get_users_bookings, get_all_bookings
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm, RequestForm, BookingForm
 from django.contrib.auth import authenticate, login, logout
@@ -15,9 +15,7 @@ def home_page(request):
 def feed(request):
     form = RequestForm()
     requests = get_requests(request.user)
-    bookings = get_bookings(None)
-
-    return render(request, 'feed.html', {'form' : form, 'requests' : requests, 'bookings' : bookings})
+    return render(request, 'feed.html', {'form' : form, 'requests' : requests})
 
 @login_required
 def new_request(request):
@@ -133,3 +131,8 @@ def new_booking(request, request_id):
     else:
         form = BookingForm(instance = pending_request)
         return render(request, 'new_booking.html', {'form': form, 'request' : pending_request})
+
+def bookings(request):
+    # Edit to make admins see all and user see there own bookings
+    bookings = get_users_bookings(request.user)
+    return render(request, 'bookings.html', {'bookings' : bookings})
