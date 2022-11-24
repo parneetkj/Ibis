@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 from lessons.forms import RequestForm
 from lessons.models import User
-from lessons.tests.helpers import reverse_with_next, create_requests
+from lessons.tests.helpers import reverse_with_next
 
 class PendingRequestsViewTestCase(TestCase):
     """Test case of pending requests view"""
@@ -29,3 +29,8 @@ class PendingRequestsViewTestCase(TestCase):
         form = response.context['form']
         self.assertTrue(isinstance(form, RequestForm))
         self.assertFalse(form.is_bound)
+
+    def test_get_pending_request_redirects_when_not_logged_in(self):
+        redirect_url = reverse_with_next('log_in', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)

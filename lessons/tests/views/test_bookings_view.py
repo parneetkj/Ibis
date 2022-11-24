@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 from lessons.forms import BookingForm
 from lessons.models import User
-from lessons.tests.helpers import create_bookings
+from lessons.tests.helpers import create_bookings, reverse_with_next
 
 class BookingsViewTestCase(TestCase):
     """Test case of bookings view"""
@@ -37,3 +37,8 @@ class BookingsViewTestCase(TestCase):
             self.assertNotContains(response, f'Teacher__{count}')
         for count in range (30,40):
             self.assertContains(response, f'Teacher__{count}')
+
+    def test_get_bookings_redirects_when_not_logged_in(self):
+        redirect_url = reverse_with_next('log_in', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)

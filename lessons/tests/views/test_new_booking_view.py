@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from lessons.models import User, Request, Booking
 from lessons.forms import BookingForm
-from lessons.tests.helpers import create_requests
+from lessons.tests.helpers import create_requests, reverse_with_next
 
 class NewBookingViewTestCase(TestCase):
     """Test case of new booking view"""
@@ -39,6 +39,11 @@ class NewBookingViewTestCase(TestCase):
         form = response.context['form']
         self.assertTrue(isinstance(form, BookingForm))
         self.assertContains(response, "Mrs.Smith")
+
+    def test_get_new_booking_redirects_when_not_logged_in(self):
+        redirect_url = reverse_with_next('log_in', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
     #Add tests for when POST request is used
 
