@@ -5,13 +5,17 @@ from .models import Request
 from .helpers import get_requests
 from .models import User
 from .forms import SignUpForm
+from .decorators import student_required
 from django.contrib.auth import login
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 
 def home_page(request):
     return render(request, 'home_page.html')
-# Create your views here.
+
+@login_required
+@student_required
 def feed(request):
     form = RequestForm()
     # Needs to be filtered by user

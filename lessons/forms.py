@@ -22,7 +22,7 @@ class SignUpForm(forms.ModelForm):
 
         model = User
         fields = ['first_name','last_name','email']
-        
+
 
     new_password = forms.CharField(
         label='Password',
@@ -53,5 +53,6 @@ class SignUpForm(forms.ModelForm):
             last_name=self.cleaned_data.get('last_name'),
             email=self.cleaned_data.get('email'),
             password=self.cleaned_data.get('new_password'),
+            is_student = True,
         )
         return user
