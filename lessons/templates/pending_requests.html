@@ -1,24 +1,11 @@
 {% extends 'base_content.html' %}
 {% block content %}
 <div class="container">
-  <div class="row">
-    <div class="col-12">
-      <h1>Pending Requests</h1>
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Student</th>
-          </tr>
-        </thead>
-        {% for request in requests %}
-          <tr>
-            <td><a href="{% url 'new_booking' request.id %}">{{ request.id }}</td>
-            <td>{{ request.student }}</td>
-          </tr>
-        {% endfor %}
-      </table>
-    </div>
+  <h1>Pending Requests</h1>
+  <div class="row row-cols-2 row-cols-md-2 g-4">
+    {% for request in requests %}
+    {% include 'partials/pending_request_as_card.html' with request=request show_button=True%}
+    {% endfor %}
   </div>
 </div>
 {% endblock %}

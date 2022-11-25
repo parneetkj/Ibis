@@ -1,15 +1,20 @@
-<tbody>
-  <tr>
-    <td> {{ booking.id }} </td>
-    <td> {{ booking.student.first_name }} </td>
-    <td> {{ booking.day }} </td>
-    <td> {{ booking.time }} </td>
-    <td> {{ booking.start_date }} </td>
-    <td> {{ booking.no_of_lessons }} </td>
-    <td> {{ booking.interval }} </td>
-    <td> {{ booking.duration }} </td>
-    <td> {{ booking.teacher }} </td>
-    <!-- Add link to see invoice here later -->
-    <td><a href="#">TBA</a></td>
-  </tr>
-</tbody>
+<div class = "col">
+  <div class="card mb-3 ">
+    <div class="card-body">
+      <h5 class="card-header">Booking {{ booking.id }}</h5>
+      <p class="card-text lead">
+        Lesson booked for <strong>{{ booking.student }}</strong> on <strong>{{ booking.day }}</strong> at <strong>{{ booking.time }}</strong>
+        Starting on <strong>{{ booking.start_date }}</strong>, you will have <strong>{{ booking.no_of_lessons }}</strong> lessons every 
+          <strong>{{ booking.interval }}</strong> weeks. The lessons will be <strong>{{ booking.duration }}</strong> minutes long. Your teacher
+        will be <strong>{{ booking.teacher }}</strong>.
+      </p>
+    </div>
+    <div class="card-footer">
+      <a href="#" type="button" class="btn btn-primary">Edit</a>
+      <a href="#" type="button" class="btn btn-danger">Delete</a>
+    </div>
+    <!-- {% if booking.student.is_superuser %} -->
+    <!-- {% endif %} -->
+  </div>
+</div>
+  

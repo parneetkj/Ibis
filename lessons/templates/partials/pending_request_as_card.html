@@ -1,0 +1,18 @@
+<div class = "col">
+  <div class="card mb-3 " id="request_card">
+    <div class="card-body">
+      <h5 class="card-header">Request {{ request.id }}</h5>
+      <p class="card-text lead"> 
+        <b>{{ request.student }}</b> has requested a lesson on <b>{{ request.date }}</b> at <b>{{ request.time }}</b>. 
+        They would like <b>{{ request.amount }}</b> lessons every <b>{{ request.interval }}</b> weeks. 
+        They would like their lessons to be <b>{{ request.duration }}</b> minutes long. 
+        They would like to learn <b>{{ request.topic }}</b> with <b>{{ request.teacher }}</b> teacher.
+      </p>
+    </div>
+    {% if show_button %}
+    <div class="card-footer">
+      <a href="{%url 'new_booking' request_id=request.id%}" type="button" class="btn btn-primary">Book Lesson</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
