@@ -4,7 +4,6 @@ from django.test import TestCase
 from django.urls import reverse
 from lessons.models import User, Booking
 from lessons.forms import BookingForm
-from lessons.tests.helpers import reverse_with_next, create_requests
 
 class UpdateBookingViewTestCase(TestCase):
     """Test case of edit booking view"""
@@ -60,5 +59,4 @@ class UpdateBookingViewTestCase(TestCase):
         self.assertTrue(isinstance(form, BookingForm))
         self.assertContains(response, "Mrs.Smith")
 
-        #Change a value in the form
-        #Check against the database
+    

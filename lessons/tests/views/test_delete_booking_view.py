@@ -62,3 +62,5 @@ class DeleteBookingViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'bookings.html')
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 2)
+
+#test only admin can delete bookings
