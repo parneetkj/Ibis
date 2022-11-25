@@ -139,6 +139,17 @@ def new_booking(request, id):
         return render(request, 'new_booking.html', {'form': form, 'request' : pending_request})
 
 @login_required
+def bookings(request):
+    # Edit to make admins see all and user see there own bookings
+    if request.user.is_superuser:
+        pass
+    else:
+        messages.add_message(request, messages.INFO, "To edit or delete your bookings please contact your school administrator")
+    
+    bookings = get_users_bookings(request.user)
+    return render(request, 'bookings.html', {'bookings' : bookings})
+
+@login_required
 def update_booking(request, id):
     try:
         booking_request = Booking.objects.get(pk=id)
@@ -159,12 +170,11 @@ def update_booking(request, id):
         return render(request, 'update_booking.html', {'form': form, 'request' : booking_request})
 
 @login_required
-def bookings(request):
-    # Edit to make admins see all and user see there own bookings
-    if request.user.is_superuser:
-        pass
+def delete_booking(request, id):
+    if (Booking.objects.filter(pk=id)):
+        Booking.objects.filter(pk=id).delete()
+        messages.add_message(request, messages.SUCCESS, "Booking deleted!")
+        return redirect('bookings')
     else:
-        messages.add_message(request, messages.INFO, "To edit or delete your bookings please contact your school administrator")
-    
-    bookings = get_users_bookings(request.user)
-    return render(request, 'bookings.html', {'bookings' : bookings})
+        messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")    
+        return redirect('bookings')

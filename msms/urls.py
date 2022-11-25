@@ -28,6 +28,7 @@ urlpatterns = [
     path('pending_requests/', views.pending_requests, name='pending_requests'),
     path('new_booking/<int:id>', views.new_booking, name='new_booking'),
     path('update_booking/<int:id>', views.update_booking, name='update_booking'),
+    path('delete_booking/<int:id>', views.delete_booking, name='delete_booking'),
     path('log_in/', views.log_in, name='log_in'),
     path('log_out/', views.log_out, name='log_out'),
     path('bookings/', views.bookings, name='bookings'),
