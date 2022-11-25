@@ -111,10 +111,9 @@ def pending_requests(request):
     return render(request, 'pending_requests.html', {'form' : form, 'requests' : requests})
 
 @login_required
-def new_booking(request, request_id):
-    #pending_request = Request.objects.get(id=request_id)
+def new_booking(request, id):
     try:
-        pending_request = Request.objects.get(id=request_id)
+        pending_request = Request.objects.get(id=id)
     except:
         messages.add_message(request, messages.ERROR, "Request could not be found!")
         return redirect('feed')
@@ -131,13 +130,33 @@ def new_booking(request, request_id):
                 teacher=form.cleaned_data.get('teacher'),
                 no_of_lessons=form.cleaned_data.get('no_of_lessons'),
             )
-            Request.objects.filter(id=request_id).delete()
+            Request.objects.filter(id=id).delete()
             return redirect('feed')
         else:
             return render(request, 'new_booking.html', {'form': form, 'request': pending_request})
     else:
         form = BookingForm(instance = pending_request)
         return render(request, 'new_booking.html', {'form': form, 'request' : pending_request})
+
+@login_required
+def update_booking(request, id):
+    try:
+        booking_request = Booking.objects.get(pk=id)
+    except:
+        messages.add_message(request, messages.ERROR, "Booking could not be found!")
+        return redirect('bookings')
+        
+    if request.method == 'POST':
+        form = BookingForm(instance = booking_request, data = request.POST)
+        if (form.is_valid()):
+            messages.add_message(request, messages.SUCCESS, "Booking successfully updated!")
+            form.save()
+            return redirect('bookings')
+        else:
+            return render(request, 'update_booking.html', {'form': form, 'request' : booking_request})
+    else:
+        form = BookingForm(instance = booking_request)
+        return render(request, 'update_booking.html', {'form': form, 'request' : booking_request})
 
 @login_required
 def bookings(request):

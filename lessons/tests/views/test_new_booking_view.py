@@ -26,7 +26,7 @@ class NewBookingViewTestCase(TestCase):
         )
         self.requestData.save()
         self.target_request = Request.objects.get(student = self.user)
-        self.url = reverse('new_booking', kwargs={'request_id': self.target_request.id})
+        self.url = reverse('new_booking', kwargs={'id': self.target_request.id})
 
     def test_new_booking_url(self):
         self.assertEqual(self.url,f'/new_booking/{self.target_request.id}')
@@ -49,7 +49,7 @@ class NewBookingViewTestCase(TestCase):
 
     def test_redirect_with_incorrect_request_id(self):
         self.client.login(username=self.user.username, password='Password123')
-        request_url = reverse('new_booking', kwargs={'request_id': (Request.objects.count()) +1})
+        request_url = reverse('new_booking', kwargs={'id': (Request.objects.count()) +1})
         redirect_url = reverse('feed')
         response = self.client.get(request_url, follow=True)
         self.assertRedirects(response, redirect_url,
@@ -73,7 +73,7 @@ class NewBookingViewTestCase(TestCase):
         other_user = User.objects.get(username='@janedoe')
         create_requests(other_user, 100, 100)
         create_requests(self.user, 200, 200)
-        url = reverse('new_booking', kwargs={'request_id': 200})
+        url = reverse('new_booking', kwargs={'id': 200})
         response = self.client.get(url)
         for count in range(200, 200):
             self.assertContains(response, f'Topic__{count}')
