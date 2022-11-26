@@ -1,6 +1,5 @@
 from django import forms
 from.models import Request
-import datetime
 from django.utils import timezone
 from.models import User
 from django.core.validators import RegexValidator
@@ -16,9 +15,13 @@ class RequestForm(forms.ModelForm):
     def clean(self):
         super().clean()
         date = self.cleaned_data.get('date')
+        if (date == None):
+            return
         if(date <= timezone.now().date()):
             self.add_error('date','Date must be in the future.')
             time = self.cleaned_data.get('time')
+            if (time == None):
+                return
             if (date == timezone.now().date() and time <= timezone.now().time()):
                 self.add_error('time','Time must be in the future.')
 
