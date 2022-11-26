@@ -11,7 +11,7 @@ from .forms import LogInForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 
-from .decorators import student_required
+from .decorators import student_required, admin_required, director_required
 
 
 # Create your views here.
@@ -25,7 +25,9 @@ def feed(request):
     requests = get_requests(request.user)
     return render(request, 'feed.html', {'form' : form, 'requests' : requests})
 
+
 @login_required
+@student_required
 def new_request(request):
     if request.method == 'POST':
         form = RequestForm(request.POST)
@@ -49,6 +51,7 @@ def new_request(request):
 
 
 @login_required
+@student_required
 def update_request(request, id):
     try:
         lesson_request = Request.objects.get(pk=id)
@@ -87,6 +90,7 @@ def log_in(request):
     return render(request, 'log_in.html', {'form': form, 'next': next})
 
 @login_required
+@student_required
 def delete_request(request, id):
     if (Request.objects.filter(pk=id)):
         Request.objects.filter(pk=id).delete()
