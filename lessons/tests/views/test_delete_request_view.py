@@ -9,7 +9,7 @@ class DeleteRequestViewTestCase(TestCase):
     ]
 
     def setUp(self):
-        self.user = User.objects.get(username='@johndoe')
+        self.user = User.objects.get(username='johndoe@example.org')
         self.requestData = Request(
             student=self.user,
             date = '2023-12-12',
@@ -23,7 +23,7 @@ class DeleteRequestViewTestCase(TestCase):
         self.requests = Request.objects.filter(student = self.user)
 
     def test_delete_request_redirects_correctly(self):
-        self.client.login(email=self.user.email, password='Password123')
+        self.client.login(username=self.user.username, password='Password123')
         self.requestData.save()
         request_url = reverse('delete_request', kwargs={'id': self.requests[0].pk})
         redirect_url = reverse('feed')
@@ -36,7 +36,7 @@ class DeleteRequestViewTestCase(TestCase):
         self.assertEqual(len(messages_list), 1)
 
     def test_delete_request_deletes_correct_request(self):
-        self.client.login(email=self.user.email, password='Password123')
+        self.client.login(username=self.user.username, password='Password123')
         self.requestData.save()
         before_count = Request.objects.count()
         pk = self.requests[0].pk
@@ -62,7 +62,7 @@ class DeleteRequestViewTestCase(TestCase):
         self.assertEqual(len(messages_list), 1)
 
     def test_delete_request_redirects_if_not_found(self):
-        self.client.login(email=self.user.email, password='Password123')
+        self.client.login(username=self.user.username, password='Password123')
         request_url = reverse('delete_request', kwargs={'id': (Request.objects.count()) +1})
         redirect_url = reverse('feed')
         response = self.client.get(request_url, follow=True)

@@ -4,8 +4,8 @@ import datetime
 from django.utils import timezone
 from.models import User
 from django.core.validators import RegexValidator
-#from django.contrib.auth.forms import UserCreationForm
-#from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+
 
 class RequestForm(forms.ModelForm):
     class Meta:
@@ -25,17 +25,18 @@ class RequestForm(forms.ModelForm):
 class LogInForm(forms.Form):
     """Form enabling registered users to log in."""
 
-    email = forms.CharField(label="Email")
+    username = forms.CharField(label="Username")
     password = forms.CharField(label="Password", widget=forms.PasswordInput())
 
+    def get_user(self):
+        """Returns authenticated user if possible."""
 
-
-
-class LogInForm(forms.Form):
-    """Form enabling registered users to log in."""
-
-    email = forms.CharField(label="Email")
-    password = forms.CharField(label="Password", widget=forms.PasswordInput())
+        user = None
+        if self.is_valid():
+            username = self.cleaned_data.get('username')
+            password = self.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+        return user
 
 
 
@@ -46,7 +47,8 @@ class SignUpForm(forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email']
+        fields = ['first_name', 'last_name', 'username']
+        
 
     new_password = forms.CharField(
         label='Password',
@@ -76,7 +78,6 @@ class SignUpForm(forms.ModelForm):
             self.cleaned_data.get('username'),
             first_name=self.cleaned_data.get('first_name'),
             last_name=self.cleaned_data.get('last_name'),
-            email=self.cleaned_data.get('email'),
             password=self.cleaned_data.get('new_password'),
         )
         return user

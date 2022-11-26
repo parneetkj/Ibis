@@ -142,4 +142,7 @@ MESSAGE_TAGS = {
 }
 
 # SetUp backend in Auth settings
-AUTHENTICATION_BACKENDS = ('lessons.backends.EmailBackend',)
+#AUTHENTICATION_BACKENDS = ('lessons.backends.EmailBackend',)
+
+# URL where @login_prohibited redirects to
+REDIRECT_URL_WHEN_LOGGED_IN = 'feed'

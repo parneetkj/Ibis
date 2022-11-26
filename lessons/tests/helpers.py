@@ -1,5 +1,7 @@
 from django.urls import reverse
 from lessons.models import Request
+
+
 class LogInTester:
     def _is_logged_in(self):
         return '_auth_user_id' in self.client.session.keys()

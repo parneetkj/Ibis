@@ -13,13 +13,13 @@ class FeedViewTestCase(TestCase):
 
     def setUp(self):
         self.url = reverse('feed')
-        self.user = User.objects.get(username='@johndoe')
+        self.user = User.objects.get(username='johndoe@example.org')
     
     def test_feed_url(self):
         self.assertEqual(self.url,'/feed/')
     
     def test_get_feed(self):
-        self.client.login(email=self.user.email, password='Password123')
+        self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'feed.html')
@@ -33,8 +33,8 @@ class FeedViewTestCase(TestCase):
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
     
     def test_feed_displays_posts_of_the_user(self):
-        self.client.login(email=self.user.email, password='Password123')
-        other_user = User.objects.get(username='@janedoe')
+        self.client.login(username=self.user.username, password='Password123')
+        other_user = User.objects.get(username='janedoe@example.org')
         create_requests(other_user, 10, 20)
         create_requests(self.user, 30, 40)
         response = self.client.get(self.url)
