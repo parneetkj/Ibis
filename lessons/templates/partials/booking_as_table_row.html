@@ -5,16 +5,12 @@
       <p class="card-text lead">
         Lesson booked for <strong>{{ booking.student }}</strong> on <strong>{{ booking.day }}</strong> at <strong>{{ booking.time }}</strong>
         Starting on <strong>{{ booking.start_date }}</strong>, you will have <strong>{{ booking.no_of_lessons }}</strong> lessons every 
-          <strong>{{ booking.interval }}</strong> weeks. The lessons will be <strong>{{ booking.duration }}</strong> minutes long. Your teacher
+        <strong>{{ booking.interval }}</strong> weeks. The lessons will be <strong>{{ booking.duration }}</strong> minutes long. Your teacher
         will be <strong>{{ booking.teacher }}</strong>.
       </p>
     </div>
-    <div class="card-footer">
-      <a href="{%url 'update_booking' booking.id %}" type="button" class="btn btn-primary">Edit</a>
-      <a href="{%url 'delete_booking' booking.id %}" type="button" class="btn btn-danger">Delete</a>
-    </div>
-    <!-- {% if booking.student.is_superuser %} -->
-    <!-- {% endif %} -->
+    <!-- To Do: Include if user is admin -->
+    {% include 'partials/bookings_card_footer.html'%}
   </div>
 </div>
   

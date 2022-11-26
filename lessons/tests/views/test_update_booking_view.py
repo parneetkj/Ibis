@@ -59,4 +59,4 @@ class UpdateBookingViewTestCase(TestCase):
         self.assertTrue(isinstance(form, BookingForm))
         self.assertContains(response, "Mrs.Smith")
 
-    
+#Test only admin access to page -> redirects reg user
