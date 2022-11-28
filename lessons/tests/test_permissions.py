@@ -1,9 +1,11 @@
 #from django.contrib.auth.models import User
 from django.test import TestCase, RequestFactory
 from lessons.models import User, Request
-from lessons.views import feed, home_page, sign_up, log_in, update_request
+from lessons.views import feed, home_page, SignUpView, LogInView, update_request
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
+from lessons.forms import LogInForm
+
 
 class AnonymousUserTestCase(TestCase):
     def setUp(self):
@@ -16,14 +18,16 @@ class AnonymousUserTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_anonymous_access_log_in(self):
-        request = self.factory.get('/log_in')
-        response = log_in(request)
+        self.url = reverse('log_in')
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'log_in.html')
 
     def test_anonymous_access_sign_up(self):
-        request = self.factory.get('/sign_up')
-        response = sign_up(request)
+        self.url = reverse('sign_up')
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'sign_up.html')
 
 
     def test_anonymous_access_feed_page(self):
@@ -61,17 +65,25 @@ class StudentPermissionTestCase(TestCase):
 
         #Will change later to match the code when implemented
     def test_student_access_log_in(self):
-        request = self.factory.get('/log_in')
-        request.user = self.user
-        response = log_in(request)
-        self.assertEqual(response.status_code, 200)
+        self.client.login(username=self.user.username, password="Password123")
+        self.url = reverse('log_in')
+        response = self.client.get(self.url, follow=True)
+        redirect_url = reverse('feed')
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'feed.html')
+
+    def test_is_student_when_logged_in(self):
+        self.client.login(username=self.user.username, password="Password123")
+        self.assertTrue(self.user.is_student, True)
+        self.assertFalse(self.user.is_admin, False)
+        self.assertFalse(self.user.is_director, False)
 
         #Will change later to match the code when implemented
     def test_student_access_sign_up(self):
-        request = self.factory.get('/sign_up')
-        request.user = self.user
-        response = sign_up(request)
+        self.url = reverse('sign_up')
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'sign_up.html')
 
     def test_student_access_feed_page(self):
         request = self.factory.get('/feed')
@@ -108,17 +120,29 @@ class AdminPermissionTestCase(TestCase):
 
         #Will change later to match the code when implemented
     def test_admin_access_log_in_page(self):
-        request = self.factory.get('/log_in')
-        request.user = self.user
-        response = log_in(request)
-        self.assertEqual(response.status_code, 200)
+        self.client.login(username=self.user.username, password="Password123")
+        self.url = reverse('log_in')
+        response = self.client.get(self.url) #follow = true
+        #redirect_url = reverse('feed')
+        self.assertEqual(response.status_code, 302)
+        #Should redirect to admin view
+        #self.assertTemplateUsed(response, 'feed.html')
+
+    def test_is_admin_when_logged_in(self):
+        self.client.login(username=self.user.username, password="Password123")
+        self.assertFalse(self.user.is_student, False)
+        self.assertTrue(self.user.is_admin, True)
+        self.assertFalse(self.user.is_director, False)
 
         #Will change later to match the code when implemented
     def test_admin_access_sign_up_page(self):
-        request = self.factory.get('/sign_up')
-        request.user = self.user
-        response = sign_up(request)
-        self.assertEqual(response.status_code, 200)
+        self.client.login(username=self.user.username, password="Password123")
+        self.url = reverse('sign_up')
+        response = self.client.get(self.url) #follow = true
+        #redirect_url = reverse('feed')
+        self.assertEqual(response.status_code, 302)
+        #Should redirect to admin view
+        #self.assertTemplateUsed(response, 'feed.html')
 
     def test_admin_access_update_request_page(self):
         request = self.factory.get('/update_request')
@@ -152,17 +176,29 @@ class DirectorPermissionTestCase(TestCase):
 
         #Will change later to match the code when implemented
     def test_director_access_log_in(self):
-        request = self.factory.get('/log_in')
-        request.user = self.user
-        response = log_in(request)
-        self.assertEqual(response.status_code, 200)
+        self.client.login(username=self.user.username, password="Password123")
+        self.url = reverse('log_in')
+        response = self.client.get(self.url) #follow = true
+        #redirect_url = reverse('feed')
+        self.assertEqual(response.status_code, 302)
+        #Should redirect to admin view
+        #self.assertTemplateUsed(response, 'feed.html')
+
+    def test_is_director_when_logged_in(self):
+        self.client.login(username=self.user.username, password="Password123")
+        self.assertFalse(self.user.is_student, False)
+        self.assertFalse(self.user.is_admin, False)
+        self.assertTrue(self.user.is_director, True)
 
         #Will change later to match the code when implemented
     def test_director_access_sign_up(self):
-        request = self.factory.get('/sign_up')
-        request.user = self.user
-        response = sign_up(request)
-        self.assertEqual(response.status_code, 200)
+        self.client.login(username=self.user.username, password="Password123")
+        self.url = reverse('sign_up')
+        response = self.client.get(self.url) #follow = true
+        #redirect_url = reverse('feed')
+        self.assertEqual(response.status_code, 302)
+        #Should redirect to admin view
+        #self.assertTemplateUsed(response, 'feed.html')
 
     def test_director_access_update_request_page(self):
         request = self.factory.get('/update_request')

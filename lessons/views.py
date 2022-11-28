@@ -83,7 +83,7 @@ def update_request(request, id):
     else:
         form = RequestForm(instance = lesson_request)
         return render(request, 'update_request.html', {'form': form, 'request' : lesson_request})
-    
+
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
 
