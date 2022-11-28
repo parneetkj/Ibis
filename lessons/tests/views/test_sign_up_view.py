@@ -22,6 +22,7 @@ class SignUpViewTestCase(TestCase, LogInTester):
         }
         self.user = User.objects.get(username='johndoe@example.org')
 
+
     def test_sign_up_url(self):
         self.assertEqual(self.url,'/sign_up/')
 

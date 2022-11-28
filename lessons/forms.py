@@ -1,6 +1,5 @@
 from django import forms
 from.models import Request
-import datetime
 from django.utils import timezone
 from.models import User
 from django.core.validators import RegexValidator
@@ -11,14 +10,18 @@ class RequestForm(forms.ModelForm):
     class Meta:
         model = Request
         exclude = ['student','status']
-    
+
     """Override clean method to check date and time"""
     def clean(self):
         super().clean()
         date = self.cleaned_data.get('date')
+        if (date == None):
+            return
         if(date <= timezone.now().date()):
             self.add_error('date','Date must be in the future.')
             time = self.cleaned_data.get('time')
+            if (time == None):
+                return
             if (date == timezone.now().date() and time <= timezone.now().time()):
                 self.add_error('time','Time must be in the future.')
 
@@ -48,7 +51,8 @@ class SignUpForm(forms.ModelForm):
 
         model = User
         fields = ['first_name', 'last_name', 'username']
-        
+
+
 
     new_password = forms.CharField(
         label='Password',
@@ -79,5 +83,6 @@ class SignUpForm(forms.ModelForm):
             first_name=self.cleaned_data.get('first_name'),
             last_name=self.cleaned_data.get('last_name'),
             password=self.cleaned_data.get('new_password'),
+            is_student = True,
         )
         return user
