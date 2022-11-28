@@ -50,7 +50,7 @@ class StudentPermissionTestCase(TestCase):
         ]
     def setUp(self):
         self.factory = RequestFactory()
-        self.user = User.objects.get(username='@johndoe')
+        self.user = User.objects.get(username='johndoe@example.org')
         self.user.save()
 
     def test_student_access_home_page(self):
@@ -84,10 +84,9 @@ class StudentPermissionTestCase(TestCase):
 class AdminPermissionTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
-        self.user = User.objects.create_user('@johndoe',
+        self.user = User.objects.create_user('johndoe@example.org',
             first_name='John',
             last_name='Doe',
-            email='johndoe@example.org',
             password='Password123',
             is_active=True,
             is_admin = True
@@ -130,10 +129,9 @@ class AdminPermissionTestCase(TestCase):
 class DirectorPermissionTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
-        self.user = User.objects.create_user('@johndoe',
+        self.user = User.objects.create_user('johndoe@example.org',
             first_name='John',
             last_name='Doe',
-            email='johndoe@example.org',
             password='Password123',
             is_active=True,
             is_director = True,
