@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
 from .models import User, Request, Booking
-from .helpers import get_requests, get_users_bookings, get_all_bookings
+from .helpers import get_requests, get_users_bookings, get_all_bookings, admin_required
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm, RequestForm, BookingForm
 from django.contrib.auth import authenticate, login, logout
-from .decorators import student_required, admin_required, director_required
+from .decorators import student_required, director_required
 from django.contrib import messages
 
 
@@ -111,13 +111,14 @@ def log_out(request):
     return redirect('home_page')
 
 @login_required
+@admin_required
 def pending_requests(request):
     form = RequestForm()
-    # Needs to be filtered to only be viewed by admin
     requests = requests = Request.objects.filter()
     return render(request, 'pending_requests.html', {'form' : form, 'requests' : requests})
 
 @login_required
+@admin_required
 def new_booking(request, id):
     try:
         pending_request = Request.objects.get(id=id)
@@ -147,16 +148,15 @@ def new_booking(request, id):
 
 @login_required
 def bookings(request):
-    # Edit to make admins see all and user see there own bookings
-    if request.user.is_superuser:
-        pass
-    else:
+    if request.user.is_student:
         messages.add_message(request, messages.INFO, "To edit or delete your bookings please contact your school administrator")
-    
-    bookings = get_users_bookings(request.user)
+        bookings = get_users_bookings(request.user)
+    else:
+        bookings = get_all_bookings()
     return render(request, 'bookings.html', {'bookings' : bookings})
 
 @login_required
+@admin_required
 def update_booking(request, id):
     try:
         booking_request = Booking.objects.get(pk=id)
@@ -177,6 +177,7 @@ def update_booking(request, id):
         return render(request, 'update_booking.html', {'form': form, 'request' : booking_request})
 
 @login_required
+@admin_required
 def delete_booking(request, id):
     if (Booking.objects.filter(pk=id)):
         Booking.objects.filter(pk=id).delete()

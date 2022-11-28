@@ -9,8 +9,9 @@
         will be <strong>{{ booking.teacher }}</strong>.
       </p>
     </div>
-    <!-- To Do: Include if user is admin -->
-    {% include 'partials/bookings_card_footer.html'%}
+    {% if user.is_admin %}
+      {% include 'partials/bookings_card_footer.html'%}
+    {% endif %}
   </div>
 </div>
   
