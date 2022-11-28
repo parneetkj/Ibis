@@ -16,12 +16,15 @@ class User(AbstractUser):
     )
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
- 
+    email = models.EmailField(unique=True, blank=False)
+    is_student = models.BooleanField('student status', default = False)
+    is_admin = models.BooleanField('admin status', default = False)
+    is_director = models.BooleanField('director status', default = False)
+
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 
 
-    
 class Request(models.Model):
     """Requests by students"""
 
@@ -143,5 +146,3 @@ class Booking(models.Model):
 
     def generate_invoice():
         pass
-
-

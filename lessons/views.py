@@ -6,6 +6,7 @@ from .models import Request
 from .helpers import get_requests
 from .models import User
 from .forms import SignUpForm
+
 from .forms import LogInForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
@@ -23,17 +24,23 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from django.urls import reverse
 
+from .decorators import student_required, admin_required, director_required
+
+
 # Create your views here.
 def home_page(request):
     return render(request, 'home_page.html')
 
 @login_required
+@student_required
 def feed(request):
     form = RequestForm()
     requests = get_requests(request.user)
     return render(request, 'feed.html', {'form' : form, 'requests' : requests})
 
+
 @login_required
+@student_required
 def new_request(request):
     if request.method == 'POST':
         form = RequestForm(request.POST)
@@ -57,13 +64,14 @@ def new_request(request):
 
 
 @login_required
+@student_required
 def update_request(request, id):
     try:
         lesson_request = Request.objects.get(pk=id)
     except:
         messages.add_message(request, messages.ERROR, "Request could not be found!")
         return redirect('feed')
-        
+
     if request.method == 'POST':
         form = RequestForm(instance = lesson_request, data = request.POST)
         if (form.is_valid()):
@@ -124,6 +132,7 @@ class LogInView(LoginProhibitedMixin, View):
         if user is not None:
             login(request, user)
             return redirect(self.next)
+
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
         return self.render()
 
@@ -135,13 +144,14 @@ class LogInView(LoginProhibitedMixin, View):
 
 
 @login_required
+@student_required
 def delete_request(request, id):
     if (Request.objects.filter(pk=id)):
         Request.objects.filter(pk=id).delete()
         messages.add_message(request, messages.SUCCESS, "Request deleted!")
         return redirect('feed')
     else:
-        messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")    
+        messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")
         return redirect('feed')
 
 class SignUpView(LoginProhibitedMixin, FormView):
