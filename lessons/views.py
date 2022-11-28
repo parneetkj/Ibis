@@ -6,21 +6,28 @@ from .models import Request
 from .helpers import get_requests
 from .models import User
 from .forms import SignUpForm
+
 from .forms import LogInForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
+
+from .decorators import student_required, admin_required, director_required
+
 
 # Create your views here.
 def home_page(request):
     return render(request, 'home_page.html')
 
 @login_required
+@student_required
 def feed(request):
     form = RequestForm()
     requests = get_requests(request.user)
     return render(request, 'feed.html', {'form' : form, 'requests' : requests})
 
+
 @login_required
+@student_required
 def new_request(request):
     if request.method == 'POST':
         form = RequestForm(request.POST)
@@ -44,13 +51,14 @@ def new_request(request):
 
 
 @login_required
+@student_required
 def update_request(request, id):
     try:
         lesson_request = Request.objects.get(pk=id)
     except:
         messages.add_message(request, messages.ERROR, "Request could not be found!")
         return redirect('feed')
-        
+
     if request.method == 'POST':
         form = RequestForm(instance = lesson_request, data = request.POST)
         if (form.is_valid()):
@@ -62,15 +70,15 @@ def update_request(request, id):
     else:
         form = RequestForm(instance = lesson_request)
         return render(request, 'update_request.html', {'form': form, 'request' : lesson_request})
-    
+
 def log_in(request):
     if request.method == 'POST':
         form = LogInForm(request.POST)
         next = request.POST.get('next') or ''
         if form.is_valid():
-            email = form.cleaned_data.get('email')
+            username = form.cleaned_data.get('email')
             password = form.cleaned_data.get('password')
-            user = authenticate(email=email, password=password)
+            user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
                 redirect_url = next or 'feed'
@@ -82,13 +90,14 @@ def log_in(request):
     return render(request, 'log_in.html', {'form': form, 'next': next})
 
 @login_required
+@student_required
 def delete_request(request, id):
     if (Request.objects.filter(pk=id)):
         Request.objects.filter(pk=id).delete()
         messages.add_message(request, messages.SUCCESS, "Request deleted!")
         return redirect('feed')
     else:
-        messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")    
+        messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")
         return redirect('feed')
 
 def sign_up(request):
