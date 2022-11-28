@@ -1,3 +1,4 @@
+
 from django import forms
 from django.test import TestCase
 from ...forms import RequestForm
@@ -12,7 +13,7 @@ class SignUpFormTestCase(TestCase):
     ]
 
     def setUp(self):
-        self.user = User.objects.get(username='@johndoe')
+        self.user = User.objects.get(username='johndoe@example.org')
         self.form_input = {
             'date' : '2022-12-12',
             'time' : '20:20',

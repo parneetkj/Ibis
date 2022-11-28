@@ -13,7 +13,7 @@ class FeedViewTestCase(TestCase):
 
     def setUp(self):
         self.url = reverse('feed')
-        self.user = User.objects.get(username='@johndoe')
+        self.user = User.objects.get(username='johndoe@example.org')
     
     def test_feed_url(self):
         self.assertEqual(self.url,'/feed/')
@@ -34,7 +34,7 @@ class FeedViewTestCase(TestCase):
     
     def test_feed_displays_posts_of_the_user(self):
         self.client.login(username=self.user.username, password='Password123')
-        other_user = User.objects.get(username='@janedoe')
+        other_user = User.objects.get(username='janedoe@example.org')
         create_requests(other_user, 10, 20)
         create_requests(self.user, 30, 40)
         response = self.client.get(self.url)

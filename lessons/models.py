@@ -8,22 +8,20 @@ from django.http import HttpResponseForbidden
 # Create your models here.
 
 class User(AbstractUser):
+    """User model used for authentication and microblog authoring."""
 
-    username = models.CharField(
-        max_length=30,
+    username = models.EmailField(
         unique=True,
-        validators=[RegexValidator(
-            regex=r'^@\w{3,}$',
-            message='Username must consist of @ followed by at least three alphanumericals'
-        )]
+        blank = False,
     )
-    
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
-    email = models.EmailField(unique=True, blank=False)
     is_student = models.BooleanField('student status', default = False)
     is_admin = models.BooleanField('admin status', default = False)
     is_director = models.BooleanField('director status', default = False)
+
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
 
 
 class Request(models.Model):
