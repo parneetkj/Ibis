@@ -4,8 +4,8 @@ from django.utils import timezone
 from .models import User
 from .models import Booking
 from django.core.validators import RegexValidator
-#from django.contrib.auth.forms import UserCreationForm
-#from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+
 
 class RequestForm(forms.ModelForm):
     class Meta:
@@ -28,17 +28,32 @@ class RequestForm(forms.ModelForm):
 
 
 class BookingForm(forms.ModelForm):
-
     class Meta:
-        model = Booking
-        exclude = ['status']
+        model = Booking    
+
+        exclude = ['status']        
+        user = None
+        if self.is_valid():
+            username = self.cleaned_data.get('username')
+            password = self.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+        return user
 
 class LogInForm(forms.Form):
     """Form enabling registered users to log in."""
 
-    email = forms.CharField(label="Email")
+    username = forms.CharField(label="Username")
     password = forms.CharField(label="Password", widget=forms.PasswordInput())
 
+    def get_user(self):
+        """Returns authenticated user if possible."""
+
+        user = None
+        if self.is_valid():
+            username = self.cleaned_data.get('username')
+            password = self.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+        return user
 
 class SignUpForm(forms.ModelForm):
     """Form enabling unregistered users to sign up."""
@@ -47,8 +62,8 @@ class SignUpForm(forms.ModelForm):
         """Form options."""
 
         model = User
+        fields = ['first_name', 'last_name', 'username']
 
-        fields = ['first_name', 'last_name', 'username', 'email']
 
 
     new_password = forms.CharField(
@@ -79,7 +94,6 @@ class SignUpForm(forms.ModelForm):
             self.cleaned_data.get('username'),
             first_name=self.cleaned_data.get('first_name'),
             last_name=self.cleaned_data.get('last_name'),
-            email=self.cleaned_data.get('email'),
             password=self.cleaned_data.get('new_password'),
             is_student = True,
         )

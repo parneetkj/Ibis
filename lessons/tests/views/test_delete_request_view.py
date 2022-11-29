@@ -9,7 +9,7 @@ class DeleteRequestViewTestCase(TestCase):
     ]
 
     def setUp(self):
-        self.user = User.objects.get(username='@johndoe')
+        self.user = User.objects.get(username='johndoe@example.org')
         self.requestData = Request(
             student=self.user,
             date = '2023-12-12',

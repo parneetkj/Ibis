@@ -9,7 +9,7 @@ class RequestTest(TestCase):
         'lessons/tests/fixtures/default_user.json',
     ]
     def setUp(self):
-        self.user = User.objects.get(username='@johndoe')
+        self.user = User.objects.get(username='johndoe@example.org')
         self.request = Request(
             student=self.user,
             date = '2023-12-12',
