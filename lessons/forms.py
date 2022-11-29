@@ -31,14 +31,7 @@ class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking    
 
-        exclude = ['status']        
-        user = None
-        if self.is_valid():
-            username = self.cleaned_data.get('username')
-            password = self.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-        return user
-
+        exclude = ['status']
 class LogInForm(forms.Form):
     """Form enabling registered users to log in."""
 
