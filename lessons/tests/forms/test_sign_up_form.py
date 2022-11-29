@@ -1,3 +1,4 @@
+"""Unit tests of the sign up form."""
 from django.contrib.auth.hashers import check_password
 from django import forms
 from django.test import TestCase
@@ -11,8 +12,7 @@ class SignUpFormTestCase(TestCase):
         self.form_input = {
             'first_name': 'Jane',
             'last_name': 'Doe',
-            'username': '@janedoe',
-            'email': 'janedoe@example.org',
+            'username': 'janedoe@example.org',
             'new_password': 'Password123',
             'password_confirmation': 'Password123'
         }
@@ -26,9 +26,6 @@ class SignUpFormTestCase(TestCase):
         self.assertIn('first_name', form.fields)
         self.assertIn('last_name', form.fields)
         self.assertIn('username', form.fields)
-        self.assertIn('email', form.fields)
-        email_field = form.fields['email']
-        self.assertTrue(isinstance(email_field, forms.EmailField))
         self.assertIn('new_password', form.fields)
         new_password_widget = form.fields['new_password'].widget
         self.assertTrue(isinstance(new_password_widget, forms.PasswordInput))
@@ -70,9 +67,8 @@ class SignUpFormTestCase(TestCase):
         form.save()
         after_count = User.objects.count()
         self.assertEqual(after_count, before_count+1)
-        user = User.objects.get(username='@janedoe')
+        user = User.objects.get(username='janedoe@example.org')
         self.assertEqual(user.first_name, 'Jane')
         self.assertEqual(user.last_name, 'Doe')
-        self.assertEqual(user.email, 'janedoe@example.org')
         is_password_correct = check_password('Password123', user.password)
         self.assertTrue(is_password_correct)
