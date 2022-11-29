@@ -4,8 +4,8 @@ from django.utils import timezone
 from .models import User
 from .models import Booking
 from django.core.validators import RegexValidator
-#from django.contrib.auth.forms import UserCreationForm
-#from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+
 
 class RequestForm(forms.ModelForm):
     class Meta:
@@ -55,8 +55,8 @@ class SignUpForm(forms.ModelForm):
         """Form options."""
 
         model = User
+        fields = ['first_name', 'last_name', 'username']
 
-        fields = ['first_name', 'last_name', 'username', 'email']
 
 
     new_password = forms.CharField(
@@ -87,9 +87,7 @@ class SignUpForm(forms.ModelForm):
             self.cleaned_data.get('username'),
             first_name=self.cleaned_data.get('first_name'),
             last_name=self.cleaned_data.get('last_name'),
-            email=self.cleaned_data.get('email'),
             password=self.cleaned_data.get('new_password'),
             is_student = True,
         )
         return user
-
