@@ -10,7 +10,7 @@ class BookingTestCase(TestCase):
     fixtures = ['lessons/tests/fixtures/default_user.json']
 
     def setUp(self):
-        self.user = User.objects.get(email='johndoe@example.org')
+        self.user = User.objects.get(username='johndoe@example.org')
 
         self.form_input = {
             'student':self.user,

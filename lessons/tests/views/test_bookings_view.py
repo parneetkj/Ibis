@@ -11,12 +11,14 @@ class BookingsViewTestCase(TestCase):
 
     fixtures = [
         'lessons/tests/fixtures/default_user.json',
-        'lessons/tests/fixtures/other_users.json'
+        'lessons/tests/fixtures/other_users.json',
+        'lessons/tests/fixtures/default_admin.json'
     ]
 
     def setUp(self):
         self.url = reverse('bookings')
-        self.user = User.objects.get(username='@johndoe')
+        self.user = User.objects.get(username='johndoe@example.org')
+        self.admin = User.objects.get(username='petra.pickles@example.org')
     
     def test_bookings_url(self):
         self.assertEqual(self.url,'/bookings/')
@@ -29,12 +31,23 @@ class BookingsViewTestCase(TestCase):
     
     def test_booking_displays_bookings_of_the_user_only(self):
         self.client.login(username=self.user.username, password='Password123')
-        other_user = User.objects.get(username='@janedoe')
+        other_user = User.objects.get(username='janedoe@example.org')
         create_bookings(other_user, 10, 20)
         create_bookings(self.user, 30, 40)
         response = self.client.get(self.url)
         for count in range (10,20):
             self.assertNotContains(response, f'Teacher__{count}')
+        for count in range (30,40):
+            self.assertContains(response, f'Teacher__{count}')
+
+    def test_booking_displays_all_bookings_for_the_admins(self):
+        self.client.login(username=self.admin.username, password='Password123')
+        other_user = User.objects.get(username='janedoe@example.org')
+        create_bookings(other_user, 10, 20)
+        create_bookings(self.user, 30, 40)
+        response = self.client.get(self.url)
+        for count in range (10,20):
+            self.assertContains(response, f'Teacher__{count}')
         for count in range (30,40):
             self.assertContains(response, f'Teacher__{count}')
 
