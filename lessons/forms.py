@@ -1,8 +1,6 @@
 from django import forms
-from .models import Request
+from .models import User, Request, Booking
 from django.utils import timezone
-from .models import User
-from .models import Booking
 from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 

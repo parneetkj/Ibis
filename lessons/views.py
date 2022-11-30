@@ -1,28 +1,19 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
-from .models import User, Request, Booking
-from .helpers import get_requests, get_users_bookings, get_all_bookings, admin_required
+from .models import Request, Booking
+from .helpers import get_requests, get_users_bookings, get_all_bookings
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm, RequestForm, BookingForm
-from django.contrib.auth import authenticate, login, logout
-from .decorators import student_required, director_required
+from django.contrib.auth import login, logout
+from .decorators import student_required, director_required, admin_required
 from django.contrib import messages
 from django.conf import settings
-from django.contrib.auth.hashers import check_password
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.http import HttpResponseForbidden, Http404
-from django.shortcuts import redirect, render
-from django.utils.decorators import method_decorator
-from .helpers import login_prohibited
+from django.core.exceptions import ImproperlyConfigured
 from django.views import View
-from django.views.generic import ListView
-from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, FormView, UpdateView
+from django.views.generic.edit import FormView
 from django.urls import reverse
 
 
-# Create your views here.
 def home_page(request):
     return render(request, 'home_page.html')
 

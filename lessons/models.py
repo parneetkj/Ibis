@@ -1,14 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
-from django.contrib.auth import authenticate, login, logout
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponseForbidden
-# Create your models here.
 
 class User(AbstractUser):
-    """User model used for authentication and microblog authoring."""
+    """User model used for authentication and microblogs authoring."""
 
     username = models.EmailField(
         unique=True,
