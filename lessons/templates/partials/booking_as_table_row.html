@@ -6,7 +6,7 @@
         Lesson booked for <strong>{{ booking.student }}</strong> on <strong>{{ booking.day }}</strong> at <strong>{{ booking.time }}</strong>
         Starting on <strong>{{ booking.start_date }}</strong>, you will have <strong>{{ booking.no_of_lessons }}</strong> lessons every 
         <strong>{{ booking.interval }}</strong> weeks. The lessons will be <strong>{{ booking.duration }}</strong> minutes long. Your teacher
-        will be <strong>{{ booking.teacher }}</strong>.
+        will be <strong>{{ booking.teacher }}</strong> and will teach you <strong>{{ booking.topic }}</strong> .
       </p>
     </div>
     {% if user.is_admin %}

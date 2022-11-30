@@ -143,5 +143,10 @@ class Booking(models.Model):
         ]
     )
 
+    topic = models.CharField(
+        max_length=50,
+        blank=False
+    )
+
     def generate_invoice():
         pass

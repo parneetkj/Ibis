@@ -20,6 +20,7 @@ class BookingTest(TestCase):
             interval=1,
             teacher="Mrs.Smith",
             no_of_lessons=4,
+            topic="Violin"
         )
 
     def test_valid_booking(self):
@@ -79,6 +80,10 @@ class BookingTest(TestCase):
 
     def test_no_of_lessons_should_not_be_less_than_1(self):
         self.booking.no_of_lessons = 0
+        self._assert_booking_is_invalid()
+
+    def test_topic_may_not_be_blank(self):
+        self.booking.topic = ""
         self._assert_booking_is_invalid()
 
     def _assert_booking_is_valid(self):

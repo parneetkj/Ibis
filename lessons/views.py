@@ -197,6 +197,7 @@ def new_booking(request, id):
                 interval=form.cleaned_data.get('interval'),
                 teacher=form.cleaned_data.get('teacher'),
                 no_of_lessons=form.cleaned_data.get('no_of_lessons'),
+                topic=form.cleaned_data.get('topic'),
             )
             Request.objects.filter(id=id).delete()
             return redirect('feed')

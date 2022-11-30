@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from lessons.models import User, Request, Booking
 from lessons.forms import BookingForm
-from lessons.tests.helpers import create_requests, create_bookings, reverse_with_next
+from lessons.tests.helpers import create_requests,reverse_with_next
 
 class NewBookingViewTestCase(TestCase):
     """Test case of new booking view"""
@@ -29,6 +29,7 @@ class NewBookingViewTestCase(TestCase):
             'interval':1,
             'teacher':'Mrs.Smith',
             'no_of_lessons':4,
+            'topic':'violin'
         }
         
         self.bookings = Booking.objects.filter()
@@ -67,11 +68,12 @@ class NewBookingViewTestCase(TestCase):
     
     def test_successful_new_booking(self):
         self.client.login(username=self.admin.username, password="Password123")
-        count_before = Booking.objects.count()
         response = self.client.post(self.url, self.data, follow=True)
-        create_bookings(self.user,100,101)
-        count_after = Booking.objects.count()
-        self.assertEqual(count_after, count_before+1)
+        form = BookingForm(data=self.data)
+        before_count = Booking.objects.count()
+        form.save()
+        after_count = Booking.objects.count()
+        self.assertEqual(after_count, before_count+1)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'new_booking.html')
         form = response.context['form']

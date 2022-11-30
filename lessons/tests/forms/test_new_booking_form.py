@@ -21,6 +21,7 @@ class BookingTestCase(TestCase):
             'interval':1,
             'teacher':'Mrs.Smith',
             'no_of_lessons':4,
+            'topic':'Violin',
         }
 
     def test_valid_request_form(self):
@@ -43,7 +44,8 @@ class BookingTestCase(TestCase):
         self.assertIn('no_of_lessons', form.fields)
         no_of_lessons = form.fields['no_of_lessons']
         self.assertTrue(isinstance(no_of_lessons, forms.IntegerField))
-
+        self.assertIn('topic', form.fields)
+        
     def test_form_uses_model_validation(self):
         self.form_input['duration'] = 61
         form = BookingForm(data=self.form_input)
@@ -63,3 +65,4 @@ class BookingTestCase(TestCase):
         self.assertEqual(booking.interval, 1)
         self.assertEqual(booking.no_of_lessons, 4)
         self.assertEqual(booking.teacher, 'Mrs.Smith')
+        self.assertEqual(booking.topic, 'Violin')

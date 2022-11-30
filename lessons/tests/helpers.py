@@ -40,6 +40,7 @@ def create_bookings(user, from_count, to_count):
             no_of_lessons=5,
             interval=1,
             duration=60,
-            teacher = teacher_text
+            teacher = teacher_text,
+            topic = "topic"
         )
         booking.save()
