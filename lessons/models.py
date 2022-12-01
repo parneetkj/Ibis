@@ -27,12 +27,10 @@ class Request(models.Model):
     
     date = models.DateField(
         blank=False,
-        default= timezone.now()
     )
 
     time = models.TimeField(
         blank=False,
-        default= timezone.now()
     )
     amount = models.IntegerField(
         validators=[
