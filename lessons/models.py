@@ -15,9 +15,17 @@ class User(AbstractUser):
     is_student = models.BooleanField('student status', default = False)
     is_admin = models.BooleanField('admin status', default = False)
     is_director = models.BooleanField('director status', default = False)
+    balance = models.FloatField(default=0)
 
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
+
+    def increase_balance(self,amount):
+        self.balance += amount
+        return self.balance
+    def decrease_balance(self,amount):
+        self.balance -= amount
+        return self.balance
 
 
 class Request(models.Model):
