@@ -24,13 +24,14 @@ urlpatterns = [
     path('new_request/', views.new_request, name='new_request'),
     path('update_request/<int:id>', views.update_request, name='update_request'),
     path('delete_request/<int:id>', views.delete_request, name='delete_request'),
-    #path('sign_up/', views.sign_up, name='sign_up'),
-    #path('log_in/', views.log_in, name='log_in'),
-    #path('log_out/', views.log_out, name='log_out'),
-    path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
+    path('pending_requests/', views.pending_requests, name='pending_requests'),
+    path('new_booking/<int:id>', views.new_booking, name='new_booking'),
+    path('update_booking/<int:id>', views.update_booking, name='update_booking'),
+    path('delete_booking/<int:id>', views.delete_booking, name='delete_booking'),
+     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('log_in/', views.LogInView.as_view(), name='log_in'),
     path('log_out/', views.log_out, name='log_out'),
+    path('bookings/', views.bookings, name='bookings'),
     path('manage_admin', views.manage_admin, name='manage_admin'),
-    path('delete_admin/<email>', views.delete_admin, name='delete_admin')
-    
+    path('delete_admin/<email>', views.delete_admin, name='delete_admin'),
 ]

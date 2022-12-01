@@ -1,19 +1,6 @@
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Student</th>
-      <th scope="col">Day</th>
-      <th scope="col">Time</th>
-      <th scope="col">Start Date</th>
-      <th scope="col">Number Of Lessons</th>
-      <th scope="col">Interval</th>
-      <th scope="col">Duration</th>
-      <th scope="col">Teacher</th>
-      <th scope="col">Invoice</th>
-    </tr>
-  </thead>
-    {% for booking in bookings %}
-    {% include 'partials/bookings_as_table_row.html' with booking=booking %}
-    {% endfor %}
-</table>
+<div class="row row-cols-2 row-cols-md-2 g-4">
+  {% for booking in bookings %}
+  {% include 'partials/booking_as_table_row.html' with booking=booking %}
+  {% endfor %}
+</div>
+

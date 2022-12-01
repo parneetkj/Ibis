@@ -1,14 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
-from django.contrib.auth import authenticate, login, logout
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponseForbidden
-# Create your models here.
 
 class User(AbstractUser):
-    """User model used for authentication and microblog authoring."""
+    """User model used for authentication and microblogs authoring."""
 
     username = models.EmailField(
         unique=True,
@@ -90,7 +86,7 @@ class Request(models.Model):
 class Booking(models.Model):
     """ Booking by admin """
 
-    student = models.CharField(max_length=50, blank=False)
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
 
     day = models.CharField(max_length=10, blank=False)
 
@@ -141,6 +137,11 @@ class Booking(models.Model):
                 message="Cannot book more than 50 lessons."
             )
         ]
+    )
+
+    topic = models.CharField(
+        max_length=50,
+        blank=False
     )
 
     def generate_invoice():
