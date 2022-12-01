@@ -1,7 +1,6 @@
 from django import forms
-from.models import Request
+from .models import User, Request, Booking
 from django.utils import timezone
-from.models import User
 from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 
@@ -25,6 +24,12 @@ class RequestForm(forms.ModelForm):
             if (date == timezone.now().date() and time <= timezone.now().time()):
                 self.add_error('time','Time must be in the future.')
 
+
+class BookingForm(forms.ModelForm):
+    class Meta:
+        model = Booking    
+        exclude = ['status']
+
 class LogInForm(forms.Form):
     """Form enabling registered users to log in."""
 
@@ -40,8 +45,6 @@ class LogInForm(forms.Form):
             password = self.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
         return user
-
-
 
 class SignUpForm(forms.ModelForm):
     """Form enabling unregistered users to sign up."""

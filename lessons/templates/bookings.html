@@ -1,0 +1,12 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <h1>Bookings: </h1>
+        <div>
+            {% include 'partials/bookings_as_table.html' with bookings=bookings %}
+            &nbsp;&nbsp;
+        </div>
+    </div>
+</div>
+{% endblock %}

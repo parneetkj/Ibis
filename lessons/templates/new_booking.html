@@ -1,0 +1,17 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <h1>New Booking</h1>
+    <div>
+      {% include 'partials/pending_request_as_card.html' with request=request show_button=False %}
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      {% include 'partials/bootstrap_form.html' with form=form %}
+      <a href="{%url 'pending_requests'%}" type="button" class="btn btn-secondary">Back</a>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

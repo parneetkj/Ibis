@@ -1,0 +1,11 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <h1>Pending Requests</h1>
+  <div class="row row-cols-2 row-cols-md-2 g-4">
+    {% for request in requests %}
+    {% include 'partials/pending_request_as_card.html' with request=request show_button=True%}
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

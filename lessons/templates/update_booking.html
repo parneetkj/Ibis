@@ -1,0 +1,16 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Edit Booking</h1>
+      <form action="{% url 'update_booking' id=request.id %}" method="post">
+        {% csrf_token %}
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        <a href="{%url 'bookings'%}" type="button" class="btn btn-secondary">Back</a>
+        <input type="submit" value="Update" class="btn btn-primary">
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

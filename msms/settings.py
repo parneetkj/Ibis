@@ -135,14 +135,11 @@ AUTH_USER_MODEL = 'lessons.User'
 # Login URL for redirection from protected pages
 LOGIN_URL = 'log_in'
 
+# URL where @admin_required redirects to student users too.
+REDIRECT_URL_WHEN_LOGGED_IN = 'feed'
+
 # Message level tags should use Bootstrap terms
 MESSAGE_TAGS = {
     message_constants.DEBUG: 'dark',
     message_constants.ERROR: 'danger',
 }
-
-# SetUp backend in Auth settings
-#AUTHENTICATION_BACKENDS = ('lessons.backends.EmailBackend',)
-
-# URL where @login_prohibited redirects to
-REDIRECT_URL_WHEN_LOGGED_IN = 'feed'
