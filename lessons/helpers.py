@@ -1,4 +1,4 @@
-from .models import Request
+from .models import Request, User
 from django.conf import settings
 from django.shortcuts import redirect
 

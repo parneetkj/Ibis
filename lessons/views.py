@@ -169,8 +169,20 @@ class SignUpView(LoginProhibitedMixin, FormView):
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
-
-
 def log_out(request):
     logout(request)
     return redirect('home_page')
+
+def manage_admin(request):
+    admin_list = User.objects.filter(is_admin=True)
+    return render(request, 'manage_admin.html', {'admin_list': admin_list})
+
+def delete_admin(request, email):
+    if(User.objects.filter(username = email)):
+        User.objects.filter(username = email).delete()
+        messages.add_message(request, messages.SUCCESS, "Admin deleted!")
+        return redirect('manage_admin')
+    else:
+        messages.add_message(request, messages.ERROR, "Couldn't delete admin")
+
+def create_admin(request):

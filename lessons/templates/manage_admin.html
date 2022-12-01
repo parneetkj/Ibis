@@ -1,0 +1,18 @@
+{% extends 'base_content.html' %}
+{% block content %}
+  <div class = "py-5">
+    <h1> Manage Admins </h1>
+  </div>
+
+
+  <div>
+    <button type="button" class="btn btn-outline-success">Create Admin</button>
+  </div>
+
+  <div class="col-xs-16 col-lg-8 col-xl-10">
+    {% include 'partials/admin_as_table.html' %}
+  </div>
+
+
+
+{% endblock %}
