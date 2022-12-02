@@ -247,7 +247,6 @@ def view_invoices(request):
     try:
         current_user = request.user
         user = User.objects.get(id=current_user.id)
-
         bookings = Request.objects.filter(student=user)
         student_id = current_user.id
         if student_id < 10:
@@ -258,4 +257,4 @@ def view_invoices(request):
     except ObjectDoesNotExist:
         return redirect('feed')
     else:
-        return render(request, 'view_invoices.html')
+        return render(request, 'view_invoices.html', {'bookings':bookings, 'student_id' : student_id})
