@@ -2,6 +2,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from lessons.models import User
+import decimal
 
 class UserModelTestCase(TestCase):
     """Unit tests for the User model."""
@@ -80,6 +81,29 @@ class UserModelTestCase(TestCase):
     def test_last_name_must_not_contain_more_than_50_characters(self):
         self.user.last_name = 'x' * 51
         self._assert_user_is_invalid()
+
+
+    def test_balance_starts_at_0(self):
+        self.assertEqual(self.user.balance, 0.00)
+
+    def test_balance_can_increase(self):
+        new_balance = self.user.increase_balance(8.56)
+        self.assertEqual(new_balance, self.user.balance)
+        self._assert_user_is_valid()
+        self.user.balance = 0.00
+
+    def test_balance_can_decrease(self):
+        new_balance = self.user.decrease_balance(8.58)
+        self.assertEqual(new_balance, self.user.balance)
+        self._assert_user_is_valid()
+        self.user.balance = 0.00
+    
+    def test_balance_can_be_negative(self):
+        new_balance = self.user.decrease_balance(100.51)
+        self.assertEqual(new_balance, self.user.balance)
+        self._assert_user_is_valid()
+        self.user.balance = 0.00
+
 
     def _assert_user_is_valid(self):
         try:
