@@ -13,6 +13,8 @@ from django.views import View
 from django.views.generic.edit import FormView
 from django.urls import reverse
 
+from lessons.models import *
+from .forms import *
 
 def home_page(request):
     return render(request, 'home_page.html')
@@ -238,3 +240,21 @@ def delete_booking(request, id):
     else:
         messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")    
         return redirect('bookings')
+
+
+@login_required
+def view_invoices(request):
+    try:
+        current_user = request.user
+        user = User.objects.get(id=current_user.id)
+        
+        student_id = current_user.id
+        if student_id < 10:
+            student_id = "00" + str(current_user.id)
+        else:
+            student_id = current_user.id
+        print(student_id)
+    except ObjectDoesNotExist:
+        return redirect('feed')
+    else:
+        return render(request, 'view_invoices.html', {'lessons':lessons, 'student_id' : student_id})

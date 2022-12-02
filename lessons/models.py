@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
+from django.utils.translation import gettext_lazy as _
 
 class User(AbstractUser):
     """User model used for authentication and microblogs authoring."""
@@ -149,7 +150,7 @@ class Booking(models.Model):
         pass
 
 class Invoice(models.Model):
-     number = models.CharField(null=True, blank=True, max_length=100)
-     price = models.IntegerField(blank=False)
-     student = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
-     booking = models.ForeignKey(Booking, blank=True, null=True, on_delete=models.SET_NULL)
+  booking = models.OneToOneField(Booking, on_delete=models.CASCADE, blank=False)
+  price = models.IntegerField(blank=False)
+  is_paid = models.BooleanField(default=False)
+  date_paid = models.DateTimeField(auto_now_add=True, blank=True)
