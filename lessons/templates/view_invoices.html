@@ -8,20 +8,19 @@
 <div class="col-12 my-auto" align="center">
 <div class="container vh-100">
 <div class="row h-30 w-30">
-<p><a href="{% url 'student_home_page' %}" class="btn btn-light btn-secondary custombtn">Back</a></p>
+<p><a href="{% url 'feed' %}" class="btn btn-light btn-secondary custombtn">Back</a></p>
 <div class="card home-description">
 <table class="table">
 <tr>
-<td><label><b>Term</b></label></td>
+<td><label><b>Invoice Number</b></label></td>
 <td><label><b>Number of Lessons</b></label></td>
 <td><label><b>Teacher to bill</b></label></td>
 <td><label><b>Invoice Reference</b></label></td>
 </tr>
-{% for lesson in lessons %}
+{% for booking in lessons %}
 <tr>
-<td>{{ lesson.term }}</td>
-<td>{{ lesson.num_of_lessons }}</td>
-<td>{{ lesson.teacher }}</td>
+<td>{{ booking.num_of_lessons }}</td>
+<td>{{ booking.teacher }}</td>
 {% if forloop.counter < 10 %}
 <td>{{student_id}}-00{{forloop.counter}}</td>
 {% else %}
