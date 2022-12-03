@@ -12,7 +12,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views import View
 from django.views.generic.edit import FormView
 from django.urls import reverse
-import datetime
+from django.utils import timezone
 
 
 def home_page(request):
@@ -242,7 +242,6 @@ def delete_booking(request, id):
 
 @login_required
 def view_invoice(request, booking_id):
-    if (request.user.is_student):
         try:
             booking_request = Booking.objects.get(pk=booking_id)
             invoice = Invoice.objects.get(booking=booking_request)
@@ -251,11 +250,10 @@ def view_invoice(request, booking_id):
             return redirect('bookings')
 
         if(invoice.booking.student != request.user):
-            messages.add_message(request, messages.ERROR, "Sorry, this is not your invoice!")
-            return redirect('bookings')
-        
-        return render(request, 'view_invoice.html', {'invoice' : invoice})
-    else:
+            if (request.user.is_student):
+                messages.add_message(request, messages.ERROR, "Sorry, this is not your invoice!")
+                return redirect('bookings')
+
         return render(request, 'view_invoice.html', {'invoice' : invoice})
 
 @login_required
@@ -274,31 +272,31 @@ def add_transfer(request, booking_id):
 @admin_required
 def submit_transfer(request, invoice_id):
     if request.method == 'POST':
-        form = RequestForm(request.POST)
+        form = TransferForm(request.POST)
         if form.is_valid():
             try:
                 invoice = Invoice.objects.get(pk=invoice_id)
+                student = invoice.booking.student
             except:
                 messages.add_message(request, messages.ERROR, "Invoice could not be found!")
                 return redirect('bookings')
 
             amount_paid = form.cleaned_data.get('amount_paid')
-
+            
             #request.user.increase_balance(amount_paid)
             if (amount_paid < invoice.price):
                 # Transfer is less than full invoice
-                if(amount_paid + request.user.balance < invoice.price):
+                if(amount_paid + student.balance < invoice.price):
                     # User did not have enough in their balance and transfer to pay off the invoice
-                    messages.add_message(request, messages.info, "User did not have balance to pay the full invoice.\nAdded the amount to their balance")
-                    request.user.increase_balance(amount_paid)
+                    messages.add_message(request, messages.INFO, "User did not have balance to pay the full invoice.\nAdded the amount to their balance")
+                    student.increase_balance(amount_paid)
                     return redirect('bookings')
 
             # Else the user has enough in balance or transfer to pay the invoice
-            messages.add_message(request, messages.success, "Invoice has been paid.")
-            request.user.increase_balance(amount_paid)
-            request.user.decrease_balance(invoice.price)
+            messages.add_message(request, messages.SUCCESS, "Invoice has been paid.")
+            student.increase_balance(amount_paid)
             Invoice.objects.filter(pk=invoice_id).update(is_paid = True)
-            Invoice.objects.filter(pk=invoice_id).update(date_paid = datetime.date.today())
+            Invoice.objects.filter(pk=invoice_id).update(date_paid = timezone.now())
             return redirect('bookings')
             
     else:
