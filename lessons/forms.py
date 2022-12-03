@@ -89,3 +89,10 @@ class SignUpForm(forms.ModelForm):
             is_student = True,
         )
         return user
+
+class TransferForm(forms.Form):
+    amount_paid = forms.FloatField(
+        label='Amount paid:',
+        min_value=0,
+        step_size=0.01
+    )

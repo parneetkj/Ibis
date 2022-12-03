@@ -12,6 +12,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views import View
 from django.views.generic.edit import FormView
 from django.urls import reverse
+import datetime
 
 
 def home_page(request):
@@ -266,6 +267,39 @@ def add_transfer(request, booking_id):
     except:
         messages.add_message(request, messages.ERROR, "Invoice could not be found!")
         return redirect('bookings')
+    form = TransferForm()
+    return render(request, 'add_transfer.html', {'invoice' : invoice, 'form' : form})
 
-    return render(request, 'add_transfer.html', {'invoice' : invoice})
-    
+@login_required
+@admin_required
+def submit_transfer(request, invoice_id):
+    if request.method == 'POST':
+        form = RequestForm(request.POST)
+        if form.is_valid():
+            try:
+                invoice = Invoice.objects.get(pk=invoice_id)
+            except:
+                messages.add_message(request, messages.ERROR, "Invoice could not be found!")
+                return redirect('bookings')
+
+            amount_paid = form.cleaned_data.get('amount_paid')
+
+            #request.user.increase_balance(amount_paid)
+            if (amount_paid < invoice.price):
+                # Transfer is less than full invoice
+                if(amount_paid + request.user.balance < invoice.price):
+                    # User did not have enough in their balance and transfer to pay off the invoice
+                    messages.add_message(request, messages.info, "User did not have balance to pay the full invoice.\nAdded the amount to their balance")
+                    request.user.increase_balance(amount_paid)
+                    return redirect('bookings')
+
+            # Else the user has enough in balance or transfer to pay the invoice
+            messages.add_message(request, messages.success, "Invoice has been paid.")
+            request.user.increase_balance(amount_paid)
+            request.user.decrease_balance(invoice.price)
+            Invoice.objects.filter(pk=invoice_id).update(is_paid = True)
+            Invoice.objects.filter(pk=invoice_id).update(date_paid = datetime.date.today())
+            return redirect('bookings')
+            
+    else:
+        return HttpResponseForbidden
