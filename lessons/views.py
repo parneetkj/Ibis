@@ -238,3 +238,34 @@ def delete_booking(request, id):
     else:
         messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")    
         return redirect('bookings')
+
+@login_required
+def view_invoice(request, booking_id):
+    if (request.user.is_student):
+        try:
+            booking_request = Booking.objects.get(pk=booking_id)
+            invoice = Invoice.objects.get(booking=booking_request)
+        except:
+            messages.add_message(request, messages.ERROR, "Invoice could not be found!")
+            return redirect('bookings')
+
+        if(invoice.booking.student != request.user):
+            messages.add_message(request, messages.ERROR, "Sorry, this is not your invoice!")
+            return redirect('bookings')
+        
+        return render(request, 'view_invoice.html', {'invoice' : invoice})
+    else:
+        return render(request, 'view_invoice.html', {'invoice' : invoice})
+
+@login_required
+@admin_required
+def add_transfer(request, booking_id):
+    try:
+        booking_request = Booking.objects.get(pk=booking_id)
+        invoice = Invoice.objects.get(booking=booking_request)
+    except:
+        messages.add_message(request, messages.ERROR, "Invoice could not be found!")
+        return redirect('bookings')
+
+    return render(request, 'add_transfer.html', {'invoice' : invoice})
+    

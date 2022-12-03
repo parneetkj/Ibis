@@ -1,0 +1,32 @@
+<table class="table">
+    <tr>
+        <td>
+            <p> Student: {{ invoice.booking.student }} </p>
+            <p> Start Date: {{ invoice.booking.start_date }} </p>
+            <p> Time: {{ invoice.booking.time }} </p>
+            <p> Number of Lessons: {{ invoice.booking.no_of_lessons }} </p>
+            <p> Interval: {{ invoice.booking.interval }} </p>
+            <p> Duration: {{ invoice.booking.duration }} </p>
+            <p> Topic: {{ invoice.booking.topic }} </p>
+            <p> Teacher: {{ invoice.booking.teacher }} </p>
+            
+        </td>
+        <td style="width:40%">
+            {% if invoice.is_paid %}
+                <div class="alert alert-success" role="alert">
+                    Paid!
+                </div>
+            {%else%}
+            <div class="alert alert-danger" role="alert">
+                Not Paid!
+            </div>
+            {%endif%}
+        </td>
+    </tr>
+    <tr>
+        {% if invoice.is_paid %}
+            <h2>Total to pay: {{invoice.price}} </h2>
+        {%else%}
+            <h2> You paid: {{invoice.price}} on the {{invoice.date_paid}}
+    </tr>
+</table>

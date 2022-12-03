@@ -152,3 +152,9 @@ class Booking(models.Model):
 
     def generate_invoice():
         pass
+
+class Invoice(models.Model):
+    booking = models.OneToOneField(Booking, on_delete=models.CASCADE, blank=False)
+    price = models.IntegerField(blank=False)
+    is_paid = models.BooleanField(default=False)
+    date_paid = models.DateTimeField(auto_now_add=True, blank=True)
