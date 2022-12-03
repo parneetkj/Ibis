@@ -22,9 +22,11 @@ class User(AbstractUser):
 
     def increase_balance(self,amount):
         self.balance += amount
+        self.save()
         return self.balance
     def decrease_balance(self,amount):
         self.balance -= amount
+        self.save()
         return self.balance
 
 
@@ -155,6 +157,6 @@ class Booking(models.Model):
 
 class Invoice(models.Model):
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE, blank=False)
-    price = models.IntegerField(blank=False)
+    price = models.FloatField(blank=False)
     is_paid = models.BooleanField(default=False)
     date_paid = models.DateTimeField(auto_now_add=True, blank=True)
