@@ -17,9 +17,9 @@
                     Paid!
                 </div>
             {%else%}
-            <div class="alert alert-danger" role="alert">
-                Not Paid!
-            </div>
+                <div class="alert alert-danger" role="alert">
+                    Not Paid!
+                </div>
             {%endif%}
         </td>
     </tr>
@@ -28,5 +28,6 @@
             <h2>Total to pay: {{invoice.price}} </h2>
         {%else%}
             <h2>{{invoice.price}} was paid on the {{invoice.date_paid}}
+        {%endif%}
     </tr>
 </table>
