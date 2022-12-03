@@ -18,7 +18,7 @@ def home_page(request):
     return render(request, 'home_page.html')
 
 @login_required
-@student_required
+#@student_required
 def feed(request):
     form = RequestForm()
     requests = get_requests(request.user)
