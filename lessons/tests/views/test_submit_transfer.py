@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from lessons.models import User, Booking, Invoice
 from lessons.tests.helpers import reverse_with_next
+from lessons.forms import TransferForm
 
 class SubmitTransferViewTestCase(TestCase):
     """Test case of feed view"""
@@ -142,3 +143,14 @@ class SubmitTransferViewTestCase(TestCase):
         self.client.login(username=self.admin.username, password='Password123')
         response = self.client.get(transfer_url, follow=True)
         self.assertEqual(response.status_code, 403)
+
+    def test_form_is_validated_correctly(self):
+        self.form_input['amount_paid'] = "Apple"
+        self.client.login(username=self.admin.username, password='Password123')
+        transfer_url = reverse('submit_transfer', kwargs={'invoice_id': self.InvoiceData.pk})
+        response = self.client.post(transfer_url, self.form_input, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'add_transfer.html')
+        form = response.context['form']
+        self.assertTrue(isinstance(form, TransferForm))
+        self.assertTrue(form.is_bound)

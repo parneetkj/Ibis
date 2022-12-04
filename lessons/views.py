@@ -274,14 +274,14 @@ def add_transfer(request, booking_id):
 def submit_transfer(request, invoice_id):
     if request.method == 'POST':
         form = TransferForm(request.POST)
+        try:
+            invoice = Invoice.objects.get(pk=invoice_id)
+            student = invoice.booking.student
+        except:
+            messages.add_message(request, messages.ERROR, "Invoice could not be found!")
+            return redirect('bookings')
+            
         if form.is_valid():
-            try:
-                invoice = Invoice.objects.get(pk=invoice_id)
-                student = invoice.booking.student
-            except:
-                messages.add_message(request, messages.ERROR, "Invoice could not be found!")
-                return redirect('bookings')
-
             amount_paid = form.cleaned_data.get('amount_paid')
             
             #request.user.increase_balance(amount_paid)
@@ -299,6 +299,8 @@ def submit_transfer(request, invoice_id):
             Invoice.objects.filter(pk=invoice_id).update(is_paid = True)
             Invoice.objects.filter(pk=invoice_id).update(date_paid = timezone.now())
             return redirect('bookings')
+        else:
+            return render(request, 'add_transfer.html', {'invoice' : invoice, 'form' : form})
             
     else:
         raise PermissionDenied
