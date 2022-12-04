@@ -25,9 +25,9 @@
     </tr>
     <tr>
         {% if invoice.is_paid %}
-            <h2>Total to pay: {{invoice.price}} </h2>
+            <h2>{{invoice.price}} was paid on the {{invoice.date_paid}}</h2>
         {%else%}
-            <h2>{{invoice.price}} was paid on the {{invoice.date_paid}}
+            <h2>Total to pay: {{invoice.price}} </h2> 
         {%endif%}
     </tr>
 </table>

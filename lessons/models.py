@@ -92,6 +92,8 @@ class Request(models.Model):
         default = "In Progress"
     )
 
+
+
 class Booking(models.Model):
     """ Booking by admin """
 
@@ -155,7 +157,7 @@ class Booking(models.Model):
 
     cost = models.FloatField(
         blank=False,
-        default=0.00,
+        default=5.00,
         validators=[
             StepValueValidator(
                 limit_value=0.01,
@@ -163,12 +165,13 @@ class Booking(models.Model):
             )  
         ]
     )
-
-    def generate_invoice():
-        pass
+    
+    def generate_invoice(self):
+        invoice = Invoice.objects.create(booking=self, price=(self.cost*(self.duration/60)*self.no_of_lessons), is_paid=False, date_paid=None)    
 
 class Invoice(models.Model):
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE, blank=False)
     price = models.FloatField(blank=False)
     is_paid = models.BooleanField(default=False)
     date_paid = models.DateTimeField(auto_now_add=True, blank=True)
+

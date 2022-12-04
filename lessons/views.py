@@ -192,6 +192,8 @@ def new_booking(request, id):
                 no_of_lessons=form.cleaned_data.get('no_of_lessons'),
                 topic=form.cleaned_data.get('topic'),
             )
+            booking_request = Booking.objects.all().latest('id')
+            booking_request.generate_invoice()
             Request.objects.filter(id=id).delete()
             return redirect('feed')
         else:
