@@ -17,6 +17,7 @@ class User(AbstractUser):
     is_director = models.BooleanField('director status', default = False)
     balance = models.FloatField(default=0)
 
+    @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 
