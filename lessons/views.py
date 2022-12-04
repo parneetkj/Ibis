@@ -119,12 +119,14 @@ def new_request(request):
                 topic=form.cleaned_data.get('topic'),
                 teacher=form.cleaned_data.get('teacher')
             )
-            return redirect('feed')
+            requests = len(get_user_requests(request.user))
+            bookings = len(get_user_bookings(request.user))
+            return redirect('feed', {'requests' : requests, 'bookings':bookings})
         else:
-            requests = get_user_requests(request.user)
-            return render(request, 'feed.html', {'form': form, 'requests' : requests})
+            return render(request, 'new_request.html', {'form': form})
     else:
-        return HttpResponseForbidden
+        form = RequestForm()
+        return render(request, 'new_request.html', {'form': form})
 
 
 @login_required
