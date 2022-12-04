@@ -29,7 +29,8 @@ class NewBookingViewTestCase(TestCase):
             'interval':1,
             'teacher':'Mrs.Smith',
             'no_of_lessons':4,
-            'topic':'violin'
+            'topic':'violin',
+            'cost': 14.50
         }
         
         self.bookings = Booking.objects.filter()

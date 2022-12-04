@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, StepValueValidator
 from django.utils import timezone
 
 class User(AbstractUser):
@@ -151,6 +151,17 @@ class Booking(models.Model):
     topic = models.CharField(
         max_length=50,
         blank=False
+    )
+
+    cost = models.FloatField(
+        blank=False,
+        default=0.00,
+        validators=[
+            StepValueValidator(
+                limit_value=0.01,
+                message="Cost must be max of two decimal places."
+            )  
+        ]
     )
 
     def generate_invoice():
