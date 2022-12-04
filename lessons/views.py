@@ -13,6 +13,7 @@ from django.views import View
 from django.views.generic.edit import FormView
 from django.urls import reverse
 from django.utils import timezone
+from django.core.exceptions import PermissionDenied
 
 
 def home_page(request):
@@ -47,7 +48,7 @@ def new_request(request):
             requests = get_requests(request.user)
             return render(request, 'feed.html', {'form': form, 'requests' : requests})
     else:
-        return HttpResponseForbidden
+        raise PermissionDenied
 
 
 @login_required
@@ -300,4 +301,4 @@ def submit_transfer(request, invoice_id):
             return redirect('bookings')
             
     else:
-        return HttpResponseForbidden
+        raise PermissionDenied

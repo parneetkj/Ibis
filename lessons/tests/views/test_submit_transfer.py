@@ -136,3 +136,9 @@ class SubmitTransferViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'feed.html')
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 1)
+
+    def test_submit_transfer_get_request_is_forbidden(self):
+        transfer_url = reverse('submit_transfer', kwargs={'invoice_id': self.InvoiceData.pk})
+        self.client.login(username=self.admin.username, password='Password123')
+        response = self.client.get(transfer_url, follow=True)
+        self.assertEqual(response.status_code, 403)

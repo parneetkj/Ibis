@@ -66,3 +66,7 @@ class NewRequestTestCase(TestCase):
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'log_in.html')
     
+    def test_new_request_get_request_is_forbidden(self):
+        self.client.login(username=self.user.username, password='Password123')
+        response = self.client.get(self.url, follow=True)
+        self.assertEqual(response.status_code, 403)
