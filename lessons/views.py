@@ -94,9 +94,13 @@ def home_page(request):
 
 @login_required
 def feed(request):
-    form = RequestForm()
-    requests = get_user_requests(request.user)
-    return render(request, 'feed.html', {'form' : form, 'requests' : requests})
+    if request.user.is_student:
+        requests = len(get_user_requests(request.user))
+        bookings = len(get_user_bookings(request.user))
+    else:
+        requests = len(get_all_requests())
+        bookings = len(get_all_bookings())
+    return render(request, 'feed.html', {'requests' : requests, 'bookings':bookings})
 
 
 @login_required

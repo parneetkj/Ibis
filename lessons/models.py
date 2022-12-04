@@ -4,7 +4,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
 class User(AbstractUser):
-    """User model used for authentication and microblogs authoring."""
+    """User model used for authentication and lessons authoring."""
 
     username = models.EmailField(
         unique=True,
@@ -23,10 +23,10 @@ class User(AbstractUser):
     def increase_balance(self,amount):
         self.balance += amount
         return self.balance
+
     def decrease_balance(self,amount):
         self.balance -= amount
         return self.balance
-
 
 class Request(models.Model):
     """Requests by students"""
