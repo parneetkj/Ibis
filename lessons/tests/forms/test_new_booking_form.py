@@ -46,6 +46,7 @@ class BookingTestCase(TestCase):
         no_of_lessons = form.fields['no_of_lessons']
         self.assertTrue(isinstance(no_of_lessons, forms.IntegerField))
         self.assertIn('topic', form.fields)
+        self.assertIn('cost', form.fields)
         
     def test_form_uses_model_validation(self):
         self.form_input['duration'] = 61
@@ -67,3 +68,4 @@ class BookingTestCase(TestCase):
         self.assertEqual(booking.no_of_lessons, 4)
         self.assertEqual(booking.teacher, 'Mrs.Smith')
         self.assertEqual(booking.topic, 'Violin')
+        self.assertEqual(booking.cost, 14.50)

@@ -27,7 +27,8 @@ class UpdateBookingViewTestCase(TestCase):
             interval=1,
             duration=30,
             teacher='Mrs.Smith',
-            topic = "violin"
+            topic = "violin",
+            cost=14.50
         )
         self.bookingData.save()
         self.bookings = Booking.objects.filter(student = self.user)

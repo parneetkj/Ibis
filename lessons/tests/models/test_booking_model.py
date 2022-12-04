@@ -86,6 +86,14 @@ class BookingTest(TestCase):
         self.booking.topic = ""
         self._assert_booking_is_invalid()
 
+    def test_cost_may_not_be_blank(self):
+        self.booking.cost = ""
+        self._assert_booking_is_invalid()
+    
+    def test_cost_may_not_be_over_2_decimal_points(self):
+        self.booking.cost = 1.999
+        self._assert_booking_is_invalid()
+
     def _assert_booking_is_valid(self):
         try:
             self.booking.full_clean()
