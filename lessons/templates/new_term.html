@@ -1,0 +1,19 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <h1>Terms</h1>
+    <div>
+      {% for term in terms %}
+        <p>Start Date : {{term.start_date}}   End Date : {{term.end_date}} </p>
+      {% endfor %}
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      {% include 'partials/bootstrap_form.html' with form=form %}
+      <a href="{%url 'feed'%}" type="button" class="btn btn-secondary">Back</a>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

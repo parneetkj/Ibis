@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
-from .models import Request, Booking
+from .models import Request, Booking, Term
 from .helpers import get_user_requests, get_all_requests, get_user_bookings, get_all_bookings
 from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm, LogInForm, RequestForm, BookingForm
+from .forms import SignUpForm, LogInForm, RequestForm, BookingForm, TermForm
 from django.contrib.auth import login, logout
 from .decorators import student_required, director_required, admin_required
 from django.contrib import messages
@@ -242,6 +242,25 @@ def delete_booking(request, id):
     else:
         messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")    
         return redirect('bookings')
+
+@login_required
+@admin_required
+def new_term(request):
+    if request.method == 'POST':
+        form = TermForm(data = request.POST)
+        terms = Term.objects.filter()
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.SUCCESS, "Form valid")
+            return redirect('feed')
+        else:
+            messages.add_message(request, messages.ERROR, "Form invalid")
+            return render(request, 'new_term.html', {'form': form, 'terms':terms})
+    else:
+        form = TermForm()
+        terms = Term.objects.filter()
+        return render(request, 'new_term.html', {'form': form, 'terms':terms})
+
         
 def log_out(request):
     logout(request)

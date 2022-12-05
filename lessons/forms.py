@@ -1,5 +1,5 @@
 from django import forms
-from .models import User, Request, Booking
+from .models import User, Request, Booking, Term
 from django.utils import timezone
 from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
@@ -89,3 +89,38 @@ class SignUpForm(forms.ModelForm):
             is_student = True,
         )
         return user
+
+class TermForm(forms.ModelForm):
+    """Form enabling admin users to create Terms."""
+
+    class Meta:
+        """Form options."""
+
+        model = Term
+        fields = ['start_date', 'end_date']
+
+    """Override clean method to check for overlapping terms"""
+    def clean(self):
+        super().clean()
+
+        start_date=self.cleaned_data.get('start_date')
+        end_date=self.cleaned_data.get('end_date')
+
+        terms = Term.objects.filter()
+
+        overlap = False
+        if (start_date == None) or (end_date ==None): 
+            return
+        elif (end_date <= start_date):
+            self.add_error('start_date','Term entered is invalid')
+            self.add_error('end_date','Term entered is invalid')
+        else:
+            for term in terms:
+                other_start_date = term.start_date
+                other_end_date = term.end_date
+                if (start_date <= other_end_date) and (other_start_date <= end_date):
+                    overlap = True
+
+            if overlap:
+                self.add_error('start_date','Term entered overlaps with an existing term.')
+                self.add_error('end_date','Term entered overlaps with an existing term.')
