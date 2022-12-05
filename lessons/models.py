@@ -12,9 +12,9 @@ class User(AbstractUser):
     )
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
-    is_student = models.BooleanField('student status', default = False)
-    is_admin = models.BooleanField('admin status', default = False)
-    is_director = models.BooleanField('director status', default = False)
+    is_student = models.BooleanField('Student Status', default = False)
+    is_admin = models.BooleanField('Admin Status', default = False)
+    is_director = models.BooleanField('Director Status', default = False)
 
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
@@ -24,7 +24,7 @@ class Request(models.Model):
     """Requests by students"""
 
     student = models.ForeignKey(User, on_delete=models.CASCADE)
-    
+
     date = models.DateField(
         blank=False,
         default= timezone.now()

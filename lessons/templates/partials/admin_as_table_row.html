@@ -1,10 +1,12 @@
 <tbody>
   <tr>
+    <td> {{ admin.id }} </td>
     <td> {{ admin.first_name }} </td>
     <td> {{ admin.last_name }} </td>
     <td> {{ admin.username }} </td>
     <td> ******** </td>
-    <td><a href='#' class="btn btn-outline-primary">Edit</td>
+    <td> {{ admin.is_director }} </td>
+    <td><a href="{%url 'update_admin'  admin.id %}" class="btn btn-outline-primary">Edit</td>
 
     <td><a href="{%url 'delete_admin'  admin.username %}" class="btn btn-outline-danger">Delete</td>
 

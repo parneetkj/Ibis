@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
-from .models import Request, Booking
+from .models import Request, Booking, User
 from .helpers import get_requests, get_users_bookings, get_all_bookings
 from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm, LogInForm, RequestForm, BookingForm
+from .forms import SignUpForm, LogInForm, RequestForm, BookingForm, CreateAdminForm, UpdateAdminForm
 from django.contrib.auth import login, logout
 from .decorators import student_required, director_required, admin_required
 from django.contrib import messages
@@ -12,7 +12,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views import View
 from django.views.generic.edit import FormView
 from django.urls import reverse
-
+from django.views import generic
+from django.contrib.auth import authenticate, login
 
 def home_page(request):
     return render(request, 'home_page.html')
@@ -237,10 +238,14 @@ def delete_booking(request, id):
         messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")
         return redirect('bookings')
 
+@login_required
+@director_required
 def manage_admin(request):
     admin_list = User.objects.filter(is_admin=True)
     return render(request, 'manage_admin.html', {'admin_list': admin_list})
 
+@login_required
+@director_required
 def delete_admin(request, email):
     if(User.objects.filter(username = email)):
         User.objects.filter(username = email).delete()
@@ -248,5 +253,40 @@ def delete_admin(request, email):
         return redirect('manage_admin')
     else:
         messages.add_message(request, messages.ERROR, "Couldn't delete admin")
+        return redirect('manage_admin')
 
+@login_required
+@director_required
 def create_admin(request):
+    if request.method == 'POST':
+        form = CreateAdminForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_admin')
+    else:
+        form = CreateAdminForm()
+    return render(request, 'create_admin.html', {'form': form})
+
+
+def update_admin(request, pk):
+    try:
+        admin_update = User.objects.get(id=pk)
+    except:
+        messages.add_message(request, messages.INFO, "Admin could not be found!")
+        return redirect('manage_admin')
+
+    if request.method == 'POST':
+        form = UpdateAdminForm(request.POST, instance=admin_update)
+        if form.is_valid():
+            messages.add_message(request, messages.SUCCESS, "Admin updated!")
+            admin_update = form.save(commit=False)
+            admin_update.save()
+
+            return redirect('manage_admin')
+        else:
+            messages.add_message(request, messages.INFO, "Error!")
+            return render(request, 'update_admin.html', {'form': form})
+    else:
+        form = UpdateAdminForm(instance=admin_update)
+
+    return render(request, 'update_admin.html', {"form": form})
