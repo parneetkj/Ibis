@@ -167,7 +167,7 @@ class Booking(models.Model):
     )
     
     def generate_invoice(self):
-        invoice = Invoice.objects.create(booking=self, price=(self.cost*(self.duration/60)*self.no_of_lessons), is_paid=False, date_paid=None)    
+        Invoice.objects.create(booking=self, price=(self.cost*(self.duration/60)*self.no_of_lessons), is_paid=False, date_paid=None)    
 
 class Invoice(models.Model):
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE, blank=False)
