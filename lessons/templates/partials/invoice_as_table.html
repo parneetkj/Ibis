@@ -18,11 +18,6 @@
                     <P>Paid!</p>
                     <p>{{invoice.date_paid}}</p>
                 </div>
-            {%elif invoice.part_payment > 0%}
-                <div class="alert alert-warning" role="alert">
-                    <p>Paid in Part</p>
-                    <p> Part-Payments: £{{invoice.part_payment}}</p>
-                </div>
             {%else%}
             <div class="alert alert-danger" role="alert">
                 Not Paid!
