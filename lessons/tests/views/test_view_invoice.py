@@ -25,20 +25,15 @@ class ViewInvoiceTestCase(TestCase):
             interval=1,
             duration=30,
             teacher='Mrs.Smith',
-            topic = "violin"
+            topic = "violin",
+            cost=5
         )
         self.bookingData.save()
-        self.InvoiceData = Invoice (
-            booking = self.bookingData,
-            total_price=300.25,
-            is_paid=False,
-            part_payment = 0
-        )
-        self.InvoiceData.save()
+        self.bookingData.generate_invoice()
     
     def test_view_invoice_displays_correct_page(self):
         self.client.login(username=self.user.username, password='Password123')
-        invoice_url = reverse('view_invoice', kwargs={'booking_id': self.InvoiceData.booking.pk})
+        invoice_url = reverse('view_invoice', kwargs={'booking_id': self.bookingData.pk})
         response = self.client.get(invoice_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'view_invoice.html')
@@ -58,7 +53,7 @@ class ViewInvoiceTestCase(TestCase):
 
     def test_wrong_user_cannot_access_others_invoice(self):
         self.client.login(username=self.other_user.username, password='Password123')
-        invoice_url = reverse('view_invoice', kwargs={'booking_id': self.InvoiceData.booking.pk})
+        invoice_url = reverse('view_invoice', kwargs={'booking_id': self.bookingData.pk})
         redirect_url = reverse('bookings')
         response = self.client.get(invoice_url, follow=True)
         self.assertRedirects(response, redirect_url,
@@ -70,14 +65,14 @@ class ViewInvoiceTestCase(TestCase):
 
     def test_admin_can_access_any_invoice(self):
         self.client.login(username=self.admin.username, password='Password123')
-        invoice_url = reverse('view_invoice', kwargs={'booking_id': self.InvoiceData.booking.pk})
+        invoice_url = reverse('view_invoice', kwargs={'booking_id': self.bookingData.pk})
         response = self.client.get(invoice_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'view_invoice.html')
         self.assertContains(response, "Not Paid!")
 
     def test_view_invoice_redirects_when_not_logged_in(self):
-        invoice_url = reverse('view_invoice', kwargs={'booking_id': self.InvoiceData.booking.pk})
+        invoice_url = reverse('view_invoice', kwargs={'booking_id': self.bookingData.pk})
         response = self.client.get(invoice_url)
         redirect_url = reverse_with_next('log_in',invoice_url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)

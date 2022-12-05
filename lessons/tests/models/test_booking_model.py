@@ -20,7 +20,8 @@ class BookingTest(TestCase):
             interval=1,
             teacher="Mrs.Smith",
             no_of_lessons=4,
-            topic="Violin"
+            topic="Violin",
+            cost='4.54'
         )
 
     def test_valid_booking(self):

@@ -25,9 +25,11 @@ class DeleteBookingViewTestCase(TestCase):
             interval=1,
             duration=30,
             teacher='Mrs.Smith', 
-            topic = "Violin"
+            topic = "Violin",
+            cost=14.50
         )
         self.bookingData.save()
+        self.bookingData.generate_invoice()
         self.bookings = Booking.objects.filter(student = self.user)
 
         self.url = reverse('delete_booking', kwargs={'id': self.bookings[0].pk})

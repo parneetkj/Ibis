@@ -41,6 +41,7 @@ def create_bookings(user, from_count, to_count):
             interval=1,
             duration=60,
             teacher = teacher_text,
-            topic = "topic"
+            topic = "topic",
+            cost='14.55'
         )
         booking.save()
