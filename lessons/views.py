@@ -192,7 +192,7 @@ def new_booking(request, id):
                     topic=form.cleaned_data.get('topic'),
                 )
                 Request.objects.filter(id=id).delete()
-                return redirect('feed')
+                return redirect('bookings')
             else:
                 return render(request, 'new_booking.html', {'form': form, 'request': pending_request})
         else:
