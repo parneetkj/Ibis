@@ -109,7 +109,7 @@ class AdminPermissionTestCase(TestCase):
         request = self.factory.get('/feed')
         request.user = self.user
         response = feed(request)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
         #Will change later to match the code when implemented
     def test_admin_access_home_page(self):
@@ -165,7 +165,7 @@ class DirectorPermissionTestCase(TestCase):
         request = self.factory.get('/feed')
         request.user = self.user
         response = feed(request)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
         #Will change later to match the code when implemented
     def test_director_access_home_page(self):

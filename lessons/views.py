@@ -119,9 +119,9 @@ def new_request(request):
                 topic=form.cleaned_data.get('topic'),
                 teacher=form.cleaned_data.get('teacher')
             )
-            requests = len(get_user_requests(request.user))
-            bookings = len(get_user_bookings(request.user))
-            return redirect('feed', {'requests' : requests, 'bookings':bookings})
+
+            return redirect('pending_requests')
+            #return render(request, 'pending_requests.html', {'requests' : requests})
         else:
             return render(request, 'new_request.html', {'form': form})
     else:
@@ -165,44 +165,42 @@ def delete_request(request, id):
 
 @login_required
 def pending_requests(request):
-    form = RequestForm()
     if request.user.is_student:
         requests = get_user_requests(request.user)
     else:
         requests = get_all_requests()
-    return render(request, 'pending_requests.html', {'form': form, 'requests' : requests})
+    return render(request, 'pending_requests.html', {'requests' : requests})
     
 
 @login_required
 @admin_required
 def new_booking(request, id):
-    try:
+    if Request.objects.get(id=id):
         pending_request = Request.objects.get(id=id)
-    except:
+        if request.method == 'POST':
+            form = BookingForm(instance = pending_request, data = request.POST)
+            if form.is_valid():
+                Booking.objects.create(
+                    student=pending_request.student,
+                    day=form.cleaned_data.get('day'),
+                    time=form.cleaned_data.get('time'),
+                    start_date=form.cleaned_data.get('start_date'),
+                    duration=form.cleaned_data.get('duration'),
+                    interval=form.cleaned_data.get('interval'),
+                    teacher=form.cleaned_data.get('teacher'),
+                    no_of_lessons=form.cleaned_data.get('no_of_lessons'),
+                    topic=form.cleaned_data.get('topic'),
+                )
+                Request.objects.filter(id=id).delete()
+                return redirect('feed')
+            else:
+                return render(request, 'new_booking.html', {'form': form, 'request': pending_request})
+        else:
+            form = BookingForm(instance = pending_request)
+            return render(request, 'new_booking.html', {'form': form, 'request' : pending_request})
+    else:
         messages.add_message(request, messages.ERROR, "Request could not be found!")
         return redirect('feed')
-    if request.method == 'POST':
-        form = BookingForm(instance = pending_request, data = request.POST)
-        if form.is_valid():
-            Booking.objects.create(
-                student=request.user,
-                day=form.cleaned_data.get('day'),
-                time=form.cleaned_data.get('time'),
-                start_date=form.cleaned_data.get('start_date'),
-                duration=form.cleaned_data.get('duration'),
-                interval=form.cleaned_data.get('interval'),
-                teacher=form.cleaned_data.get('teacher'),
-                no_of_lessons=form.cleaned_data.get('no_of_lessons'),
-                topic=form.cleaned_data.get('topic'),
-            )
-            Request.objects.filter(id=id).delete()
-            return redirect('feed')
-        else:
-            return render(request, 'new_booking.html', {'form': form, 'request': pending_request})
-    else:
-        form = BookingForm(instance = pending_request)
-        return render(request, 'new_booking.html', {'form': form, 'request' : pending_request})
-
 
 @login_required
 def bookings(request):
