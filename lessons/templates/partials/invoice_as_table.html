@@ -9,6 +9,7 @@
             <p> Duration: {{ invoice.booking.duration }} </p>
             <p> Topic: {{ invoice.booking.topic }} </p>
             <p> Teacher: {{ invoice.booking.teacher }} </p>
+            <p> Cost per 15 Mins: £{{ invoice.booking.cost }} </p>
             
         </td>
         <td style="width:40%">
@@ -27,7 +28,7 @@
         {% if invoice.is_paid %}
             <h2>£{{invoice.price}} was paid on the {{invoice.date_paid}}</h2>
         {%else%}
-            <h2>Total to pay: {{invoice.price}} </h2> 
+            <h2>Total to pay: £{{invoice.price}} </h2> 
         {%endif%}
     </tr>
 </table>

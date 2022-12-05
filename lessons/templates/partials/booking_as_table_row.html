@@ -10,7 +10,9 @@
       </p>
     </div>
     {% if user.is_admin %}
-      {% include 'partials/bookings_card_footer.html'%}
+      {% include 'partials/admin_bookings_card_footer.html'%}
+    {% else %}
+      {% include 'partials/student_bookings_card_footer.html'%}
     {% endif %}
   </div>
 </div>
