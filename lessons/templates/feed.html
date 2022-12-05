@@ -1,20 +1,13 @@
 {% extends 'base_content.html' %}
 {% block content %}
-<div class="container">
-    <div class="row">
-      <h1>Welcome</h1>
-      <div class="col-xs-12 col-lg-6 col-xl-4">
-        <h2>New Request:</h2>
-        <form action="{% url 'new_request' %}" method="post">
-          {% csrf_token %}
-          {% include 'partials/bootstrap_form.html' with form=form %}
-          <button type="submit" class="btn btn-primary">Request</button>
-        </form>
-      </div>
-      <div class="col-xs-12 col-lg-6 col-xl-8">
-        <h2>Requests:</h2>
-        {% include 'partials/requests_as_table.html' with requests=requests %}
-      </div>
-    </div>
+<div class="container py-4">
+  <header class="pb-3 mb-4 border-bottom">
+    <h1 class="display-5 fw-bold">Music School Management System</h1>
+  </header>
+  {% if user.is_student %}
+    {% include 'partials/feed_for_student.html' %}
+  {% elif user.is_admin %}
+    {% include 'partials/feed_for_admin.html' %}
+  {% endif %}
 </div>
 {% endblock %}
