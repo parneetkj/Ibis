@@ -1,5 +1,6 @@
 from django.urls import reverse
 from lessons.models import Request, Booking
+
 class LogInTester:
     def _is_logged_in(self):
         return '_auth_user_id' in self.client.session.keys()
@@ -30,18 +31,18 @@ def create_requests(user, from_count, to_count):
 def create_bookings(user, from_count, to_count):
     """Create unique bookings testing"""
     for count in range(from_count, to_count):
-        teacher_text = f'Teacher__{count}'
+        topic_text = f'Topic__{count}'
 
         booking = Booking(
             student=user,
-            day="Mon",
+            day="Monday",
             start_date="2023-12-12",
             time="10:51",
             no_of_lessons=5,
             interval=1,
             duration=60,
-            teacher = teacher_text,
-            topic = "topic",
+            topic = topic_text,
+            teacher = "Ms.Test",
             cost='14.55'
         )
         booking.save()

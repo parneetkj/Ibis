@@ -36,9 +36,9 @@ class BookingsViewTestCase(TestCase):
         create_bookings(self.user, 30, 40)
         response = self.client.get(self.url)
         for count in range (10,20):
-            self.assertNotContains(response, f'Teacher__{count}')
+            self.assertNotContains(response, f'Topic__{count}')
         for count in range (30,40):
-            self.assertContains(response, f'Teacher__{count}')
+            self.assertContains(response, f'Topic__{count}')
 
     def test_booking_displays_all_bookings_for_the_admins(self):
         self.client.login(username=self.admin.username, password='Password123')
@@ -47,9 +47,9 @@ class BookingsViewTestCase(TestCase):
         create_bookings(self.user, 30, 40)
         response = self.client.get(self.url)
         for count in range (10,20):
-            self.assertContains(response, f'Teacher__{count}')
+            self.assertContains(response, f'Topic__{count}')
         for count in range (30,40):
-            self.assertContains(response, f'Teacher__{count}')
+            self.assertContains(response, f'Topic__{count}')
 
     def test_get_bookings_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('log_in', self.url)

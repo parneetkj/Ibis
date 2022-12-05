@@ -64,8 +64,6 @@ class NewBookingViewTestCase(TestCase):
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 1)
 
-    #Add tests for when POST request is used
-    
     def test_successful_new_booking(self):
         self.client.login(username=self.admin.username, password="Password123")
         before_count = Booking.objects.count()
@@ -100,3 +98,15 @@ class NewBookingViewTestCase(TestCase):
             self.assertContains(response, f'Topic__{count}')
         for count in range(300, 300):
             self.assertNotContains(response, f'Topic__{count}')
+
+    def test_redirect_with_incorrect_request_id(self):
+        self.client.login(username=self.admin.username, password='Password123')
+        url = reverse('new_booking', kwargs={'id': (Request.objects.count()) +100})
+        redirect_url = reverse('feed')
+        response = self.client.get(url, follow=True)
+        self.assertRedirects(response, redirect_url,
+            status_code=302, target_status_code=200, fetch_redirect_response=True
+        )
+        self.assertTemplateUsed(response, 'feed.html')
+        messages_list = list(response.context['messages'])
+        self.assertEqual(len(messages_list), 1)
