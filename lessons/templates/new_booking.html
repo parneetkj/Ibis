@@ -6,6 +6,12 @@
     <div>
       {% include 'partials/pending_request_as_card.html' with request=request show_button=False %}
     </div>
+    <div>
+      <form class="form-floating mb-3">
+        <input type="text" class="form-control" id="student" value="{{request.student}}" readonly>
+        <label for="student">Student</label>
+      </form>
+    </div>
     <form method="post">
       {% csrf_token %}
       {% include 'partials/bootstrap_form.html' with form=form %}

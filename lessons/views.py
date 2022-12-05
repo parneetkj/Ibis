@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
 from .models import Request, Booking
-from .helpers import get_requests, get_users_bookings, get_all_bookings
+from .helpers import get_user_requests, get_all_requests, get_user_bookings, get_all_bookings
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm, RequestForm, BookingForm
 from django.contrib.auth import login, logout
@@ -12,63 +12,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views import View
 from django.views.generic.edit import FormView
 from django.urls import reverse
-
-
-def home_page(request):
-    return render(request, 'home_page.html')
-
-@login_required
-@student_required
-def feed(request):
-    form = RequestForm()
-    requests = get_requests(request.user)
-    return render(request, 'feed.html', {'form' : form, 'requests' : requests})
-
-
-@login_required
-@student_required
-def new_request(request):
-    if request.method == 'POST':
-        form = RequestForm(request.POST)
-        if form.is_valid():
-            Request.objects.create(
-                student=request.user,
-                date=form.cleaned_data.get('date'),
-                time=form.cleaned_data.get('time'),
-                amount=form.cleaned_data.get('amount'),
-                interval=form.cleaned_data.get('interval'),
-                duration=form.cleaned_data.get('duration'),
-                topic=form.cleaned_data.get('topic'),
-                teacher=form.cleaned_data.get('teacher')
-            )
-            return redirect('feed')
-        else:
-            requests = get_requests(request.user)
-            return render(request, 'feed.html', {'form': form, 'requests' : requests})
-    else:
-        return HttpResponseForbidden
-
-
-@login_required
-@student_required
-def update_request(request, id):
-    try:
-        lesson_request = Request.objects.get(pk=id)
-    except:
-        messages.add_message(request, messages.ERROR, "Request could not be found!")
-        return redirect('feed')
-
-    if request.method == 'POST':
-        form = RequestForm(instance = lesson_request, data = request.POST)
-        if (form.is_valid()):
-            messages.add_message(request, messages.SUCCESS, "Request updated!")
-            form.save()
-            return redirect('feed')
-        else:
-            return render(request, 'update_request.html', {'form': form, 'request' : lesson_request})
-    else:
-        form = RequestForm(instance = lesson_request)
-        return render(request, 'update_request.html', {'form': form, 'request' : lesson_request})
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
@@ -129,17 +72,6 @@ class LogInView(LoginProhibitedMixin, View):
         return render(self.request, 'log_in.html', {'form': form, 'next': self.next})
 
 
-@login_required
-@student_required
-def delete_request(request, id):
-    if (Request.objects.filter(pk=id)):
-        Request.objects.filter(pk=id).delete()
-        messages.add_message(request, messages.SUCCESS, "Request deleted!")
-        return redirect('feed')
-    else:
-        messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")
-        return redirect('feed')
-
 class SignUpView(LoginProhibitedMixin, FormView):
     """View that signs up user."""
 
@@ -157,52 +89,124 @@ class SignUpView(LoginProhibitedMixin, FormView):
 
 
 
-def log_out(request):
-    logout(request)
-    return redirect('home_page')
+def home_page(request):
+    return render(request, 'home_page.html')
 
 @login_required
-@admin_required
+def feed(request):
+    if request.user.is_student:
+        requests = len(get_user_requests(request.user))
+        bookings = len(get_user_bookings(request.user))
+    else:
+        requests = len(get_all_requests())
+        bookings = len(get_all_bookings())
+    return render(request, 'feed.html', {'requests' : requests, 'bookings':bookings})
+
+
+@login_required
+@student_required
+def new_request(request):
+    if request.method == 'POST':
+        form = RequestForm(request.POST)
+        if form.is_valid():
+            Request.objects.create(
+                student=request.user,
+                date=form.cleaned_data.get('date'),
+                time=form.cleaned_data.get('time'),
+                amount=form.cleaned_data.get('amount'),
+                interval=form.cleaned_data.get('interval'),
+                duration=form.cleaned_data.get('duration'),
+                topic=form.cleaned_data.get('topic'),
+                teacher=form.cleaned_data.get('teacher')
+            )
+
+            return redirect('pending_requests')
+            #return render(request, 'pending_requests.html', {'requests' : requests})
+        else:
+            return render(request, 'new_request.html', {'form': form})
+    else:
+        form = RequestForm()
+        return render(request, 'new_request.html', {'form': form})
+
+
+@login_required
+@student_required
+def update_request(request, id):
+    try:
+        lesson_request = Request.objects.get(pk=id)
+    except:
+        messages.add_message(request, messages.ERROR, "Request could not be found!")
+        return redirect('feed')
+
+    if request.method == 'POST':
+        form = RequestForm(instance = lesson_request, data = request.POST)
+        if (form.is_valid()):
+            messages.add_message(request, messages.SUCCESS, "Request updated!")
+            form.save()
+            return redirect('feed')
+        else:
+            return render(request, 'update_request.html', {'form': form, 'request' : lesson_request})
+    else:
+        form = RequestForm(instance = lesson_request)
+        return render(request, 'update_request.html', {'form': form, 'request' : lesson_request})
+
+
+@login_required
+@student_required
+def delete_request(request, id):
+    if (Request.objects.filter(pk=id)):
+        Request.objects.filter(pk=id).delete()
+        messages.add_message(request, messages.SUCCESS, "Request deleted!")
+        return redirect('feed')
+    else:
+        messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")
+        return redirect('feed')
+
+
+@login_required
 def pending_requests(request):
-    form = RequestForm()
-    requests = requests = Request.objects.filter()
-    return render(request, 'pending_requests.html', {'form' : form, 'requests' : requests})
+    if request.user.is_student:
+        requests = get_user_requests(request.user)
+    else:
+        requests = get_all_requests()
+    return render(request, 'pending_requests.html', {'requests' : requests})
+    
 
 @login_required
 @admin_required
 def new_booking(request, id):
-    try:
+    if Request.objects.get(id=id):
         pending_request = Request.objects.get(id=id)
-    except:
+        if request.method == 'POST':
+            form = BookingForm(instance = pending_request, data = request.POST)
+            if form.is_valid():
+                Booking.objects.create(
+                    student=pending_request.student,
+                    day=form.cleaned_data.get('day'),
+                    time=form.cleaned_data.get('time'),
+                    start_date=form.cleaned_data.get('start_date'),
+                    duration=form.cleaned_data.get('duration'),
+                    interval=form.cleaned_data.get('interval'),
+                    teacher=form.cleaned_data.get('teacher'),
+                    no_of_lessons=form.cleaned_data.get('no_of_lessons'),
+                    topic=form.cleaned_data.get('topic'),
+                )
+                Request.objects.filter(id=id).delete()
+                return redirect('bookings')
+            else:
+                return render(request, 'new_booking.html', {'form': form, 'request': pending_request})
+        else:
+            form = BookingForm(instance = pending_request)
+            return render(request, 'new_booking.html', {'form': form, 'request' : pending_request})
+    else:
         messages.add_message(request, messages.ERROR, "Request could not be found!")
         return redirect('feed')
-    if request.method == 'POST':
-        form = BookingForm(instance = pending_request, data = request.POST)
-        if form.is_valid():
-            Booking.objects.create(
-                student=request.user,
-                day=form.cleaned_data.get('day'),
-                time=form.cleaned_data.get('time'),
-                start_date=form.cleaned_data.get('start_date'),
-                duration=form.cleaned_data.get('duration'),
-                interval=form.cleaned_data.get('interval'),
-                teacher=form.cleaned_data.get('teacher'),
-                no_of_lessons=form.cleaned_data.get('no_of_lessons'),
-                topic=form.cleaned_data.get('topic'),
-            )
-            Request.objects.filter(id=id).delete()
-            return redirect('feed')
-        else:
-            return render(request, 'new_booking.html', {'form': form, 'request': pending_request})
-    else:
-        form = BookingForm(instance = pending_request)
-        return render(request, 'new_booking.html', {'form': form, 'request' : pending_request})
 
 @login_required
 def bookings(request):
     if request.user.is_student:
         messages.add_message(request, messages.INFO, "To edit or delete your bookings please contact your school administrator")
-        bookings = get_users_bookings(request.user)
+        bookings = get_user_bookings(request.user)
     else:
         bookings = get_all_bookings()
     return render(request, 'bookings.html', {'bookings' : bookings})
@@ -238,3 +242,7 @@ def delete_booking(request, id):
     else:
         messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")    
         return redirect('bookings')
+        
+def log_out(request):
+    logout(request)
+    return redirect('home_page')

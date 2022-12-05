@@ -10,9 +10,7 @@
       </p>
     </div>
     {% if show_button %}
-    <div class="card-footer">
-      <a href="{%url 'new_booking' id=request.id%}" type="button" class="btn btn-primary">Book Lesson</a>
-    </div>
+    {% include 'partials/pending_requests_card_footer.html'%}
     {% endif %}
   </div>
 </div>
