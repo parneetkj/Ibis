@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
-from .models import Request, Booking, Invoice
-from .helpers import get_user_requests, get_all_requests, get_user_bookings, get_all_bookings
+from .models import Request, Booking, Invoice, Transfer
+from .helpers import get_user_requests, get_all_requests, get_user_bookings, get_all_bookings, get_all_transfers, adjust_student_balance, check_for_refund
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm, RequestForm, BookingForm, TransferForm
 from django.contrib.auth import login, logout
@@ -14,6 +14,7 @@ from django.views.generic.edit import FormView
 from django.urls import reverse
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
+from decimal import Decimal
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
@@ -195,9 +196,11 @@ def new_booking(request, id):
                 teacher=form.cleaned_data.get('teacher'),
                 no_of_lessons=form.cleaned_data.get('no_of_lessons'),
                 topic=form.cleaned_data.get('topic'),
+                cost=form.cleaned_data.get('cost'),
             )
             booking_request = Booking.objects.all().latest('id')
             booking_request.generate_invoice()
+            adjust_student_balance(pending_request.student,0)
             Request.objects.filter(id=id).delete()
             return redirect('feed')
         else:
@@ -240,13 +243,18 @@ def update_booking(request, id):
 @login_required
 @admin_required
 def delete_booking(request, id):
-    if (Booking.objects.filter(pk=id)):
-        Booking.objects.filter(pk=id).delete()
-        messages.add_message(request, messages.SUCCESS, "Booking deleted!")
-        return redirect('bookings')
-    else:
+    try:
+        booking = Booking.objects.get(pk=id)
+    except:
         messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")    
         return redirect('bookings')
+   
+    check_for_refund(booking)
+    booking.delete()
+    messages.add_message(request, messages.SUCCESS, "Booking deleted!")
+    return redirect('bookings')
+
+        
         
 def log_out(request):
     logout(request)
@@ -270,72 +278,23 @@ def view_invoice(request, booking_id):
 
 @login_required
 @admin_required
-def add_transfer(request, booking_id):
-    try:
-        booking_request = Booking.objects.get(pk=booking_id)
-        invoice = Invoice.objects.get(booking=booking_request)
-    except:
-        messages.add_message(request, messages.ERROR, "Invoice could not be found!")
-        return redirect('bookings')
-    form = TransferForm()
-    return render(request, 'add_transfer.html', {'invoice' : invoice, 'form' : form})
-
-@login_required
-@admin_required
-def submit_transfer(request, invoice_id):
+def transfers(request):
+    transfers = get_all_transfers()
     if request.method == 'POST':
-        
         form = TransferForm(request.POST)
-        try:
-            invoice = Invoice.objects.get(pk=invoice_id)
-            student = invoice.booking.student
-        except:
-            messages.add_message(request, messages.ERROR, "Invoice could not be found!")
-            return redirect('bookings')
-
         if form.is_valid():
-            amount_paid = form.cleaned_data.get('amount_paid')
-            
-            if (amount_paid < invoice.total_price):
-                # Transfer is less than full invoice
-                if(amount_paid + invoice.part_payment < invoice.total_price):
-                    # User did not have enough in their balance and transfer to pay off the invoice
-                    return under_payment(request,invoice,amount_paid)
-                elif (amount_paid + invoice.part_payment >= invoice.total_price):
-                    return over_payment(request,invoice,amount_paid+invoice.part_payment)
-                if(amount_paid + student.balance + invoice.part_payment < invoice.total_price):
-                    # User did not have enough in their account balance, transfer and part_payment to pay the full invoice
-                    return under_payment(request,invoice,amount_paid)
-                elif(amount_paid + student.balance + invoice.part_payment >= invoice.total_price):
-                    return over_payment(request,invoice,amount_paid+student.balance+invoice.part_payment)
-
-
-            # Else the user paid enough via transfer to cover the entire invoice
-            if (student.balance < 0):
-                # if they do not have balance to cover
-                return over_payment(request, invoice, amount_paid + invoice.part_payment)
-            else:
-                # If they have a positive balance
-                return over_payment(request, invoice, amount_paid + invoice.part_payment+student.balance)
+            Transfer.objects.create(
+                student = form.cleaned_data.get('student'),
+                amount = Decimal(form.cleaned_data.get('amount')),
+                date = timezone.now()
+            )
+            adjust_student_balance(form.cleaned_data.get('student'),form.cleaned_data.get('amount'))
+            messages.add_message(request, messages.SUCCESS, "Transfer Added!")
+            form = TransferForm()
+            return render(request, 'transfers.html', {'transfers' : transfers, 'form' : form})
         else:
-            return render(request, 'add_transfer.html', {'invoice' : invoice, 'form' : form})
-            
+            return render(request, 'transfers.html', {'transfers' : transfers, 'form' : form})
     else:
-        raise PermissionDenied
+        form = TransferForm()
+        return render(request, 'transfers.html', {'transfers' : transfers, 'form' : form})
 
-def under_payment(request, invoice, amount_paid):
-    invoice.part_payment += amount_paid
-    invoice.save()
-    messages.add_message(request, messages.INFO, f"The invoice has been part-paid.\n Remaining amount: £{round(invoice.total_price - invoice.part_payment,2)} ")
-    return redirect('bookings')
-
-def over_payment(request, invoice, amount_paid):
-    messages.add_message(request, messages.SUCCESS, "Invoice has been paid.")
-    difference = amount_paid - invoice.total_price
-
-    invoice.booking.student.increase_balance(round(difference+invoice.total_price,2))
-    invoice.is_paid = True
-    invoice.date_paid = timezone.now()
-    invoice.save()
-
-    return redirect('bookings')
