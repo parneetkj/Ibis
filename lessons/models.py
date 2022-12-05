@@ -173,21 +173,21 @@ class Booking(models.Model):
 
     def edit_invoice(self):
         invoice = Invoice.objects.get(booking=self)
-        new_price = self.get_price()
+        new_price = self.get_price
 
-        if(invoice.price < new_price):
+        if(invoice.total_price < new_price):
             # The new price is more expensive than the original
-            self.student.increase_balance(invoice.price)
+            self.student.increase_balance(invoice.total_price)
             self.student.decrease_balance(new_price)
-            invoice.price=new_price
+            invoice.total_price=new_price
             invoice.is_paid=False
             invoice.date_paid= None
             invoice.save()
-        elif (invoice.price > new_price):
+        elif (invoice.total_price > new_price):
             # The new price is cheaper than the original payment
-            self.student.increase_balance(invoice.price)
+            self.student.increase_balance(invoice.total_price)
             self.student.decrease_balance(new_price)
-            invoice.price=new_price
+            invoice.total_price=new_price
             invoice.save()
 
     @property

@@ -46,3 +46,4 @@ def create_bookings(user, from_count, to_count):
             cost='14.55'
         )
         booking.save()
+        booking.generate_invoice()
