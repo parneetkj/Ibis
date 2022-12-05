@@ -73,7 +73,9 @@ class NewBookingViewTestCase(TestCase):
         after_count = Booking.objects.count()
         self.assertEqual(after_count, before_count+1)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'bookings.html')
+        self.assertTemplateUsed(response, 'feed.html')
+        messages_list = list(response.context['messages'])
+        self.assertEqual(len(messages_list), 1)
 
     def test_unsuccessful_new_booking(self):
         self.client.login(username=self.admin.username, password="Password123")

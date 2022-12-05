@@ -202,6 +202,7 @@ def new_booking(request, id):
             booking_request.generate_invoice()
             adjust_student_balance(pending_request.student,0)
             Request.objects.filter(id=id).delete()
+            messages.add_message(request, messages.SUCCESS, "Booking successfully created!")
             return redirect('feed')
         else:
             return render(request, 'new_booking.html', {'form': form, 'request': pending_request})
