@@ -167,7 +167,8 @@ class Booking(models.Model):
     )
     
     def generate_invoice(self):
-        Invoice.objects.create(booking=self, price=self.get_price, is_paid=False, date_paid=None)    
+        Invoice.objects.create(booking=self, total_price=self.get_price,date_paid=None, part_payment=0)
+        self.student.decrease_balance(self.get_price)  
 
     def edit_invoice(self):
         invoice = Invoice.objects.get(booking=self)
@@ -188,12 +189,14 @@ class Booking(models.Model):
             invoice.price=new_price
             invoice.save()
 
+    @property
     def get_price(self):
-        return self.cost*(60/self.duration)*self.no_of_lessons
+        return round(self.cost*(60/self.duration)*self.no_of_lessons,2)
 
 class Invoice(models.Model):
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE, blank=False)
-    price = models.FloatField(blank=False)
+    total_price = models.FloatField(blank=False)
+    part_payment = models.FloatField(blank=True)
     is_paid = models.BooleanField(default=False)
     date_paid = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 

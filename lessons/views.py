@@ -276,6 +276,7 @@ def add_transfer(request, booking_id):
 @admin_required
 def submit_transfer(request, invoice_id):
     if request.method == 'POST':
+        
         form = TransferForm(request.POST)
         try:
             invoice = Invoice.objects.get(pk=invoice_id)
@@ -283,27 +284,50 @@ def submit_transfer(request, invoice_id):
         except:
             messages.add_message(request, messages.ERROR, "Invoice could not be found!")
             return redirect('bookings')
-            
+
         if form.is_valid():
             amount_paid = form.cleaned_data.get('amount_paid')
             
-            #request.user.increase_balance(amount_paid)
-            if (amount_paid < invoice.price):
+            if (amount_paid < invoice.total_price):
                 # Transfer is less than full invoice
-                if(amount_paid + student.balance < invoice.price):
+                if(amount_paid + invoice.part_payment < invoice.total_price):
                     # User did not have enough in their balance and transfer to pay off the invoice
-                    messages.add_message(request, messages.INFO, "User did not have balance to pay the full invoice.\nAdded the amount to their balance")
-                    student.increase_balance(amount_paid)
-                    return redirect('bookings')
+                    return under_payment(request,invoice,amount_paid)
+                elif (amount_paid + invoice.part_payment >= invoice.total_price):
+                    return over_payment(request,invoice,amount_paid+invoice.part_payment)
+                if(amount_paid + student.balance + invoice.part_payment < invoice.total_price):
+                    # User did not have enough in their account balance, transfer and part_payment to pay the full invoice
+                    return under_payment(request,invoice,amount_paid)
+                elif(amount_paid + student.balance + invoice.part_payment >= invoice.total_price):
+                    return over_payment(request,invoice,amount_paid+student.balance+invoice.part_payment)
 
-            # Else the user has enough in balance or transfer to pay the invoice
-            messages.add_message(request, messages.SUCCESS, "Invoice has been paid.")
-            student.increase_balance(amount_paid)
-            Invoice.objects.filter(pk=invoice_id).update(is_paid = True)
-            Invoice.objects.filter(pk=invoice_id).update(date_paid = timezone.now())
-            return redirect('bookings')
+
+            # Else the user paid enough via transfer to cover the entire invoice
+            if (student.balance < 0):
+                # if they do not have balance to cover
+                return over_payment(request, invoice, amount_paid + invoice.part_payment)
+            else:
+                # If they have a positive balance
+                return over_payment(request, invoice, amount_paid + invoice.part_payment+student.balance)
         else:
             return render(request, 'add_transfer.html', {'invoice' : invoice, 'form' : form})
             
     else:
         raise PermissionDenied
+
+def under_payment(request, invoice, amount_paid):
+    invoice.part_payment += amount_paid
+    invoice.save()
+    messages.add_message(request, messages.INFO, f"The invoice has been part-paid.\n Remaining amount: £{round(invoice.total_price - invoice.part_payment,2)} ")
+    return redirect('bookings')
+
+def over_payment(request, invoice, amount_paid):
+    messages.add_message(request, messages.SUCCESS, "Invoice has been paid.")
+    difference = amount_paid - invoice.total_price
+
+    invoice.booking.student.increase_balance(round(difference+invoice.total_price,2))
+    invoice.is_paid = True
+    invoice.date_paid = timezone.now()
+    invoice.save()
+
+    return redirect('bookings')
