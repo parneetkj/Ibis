@@ -144,11 +144,11 @@ class AdminPermissionTestCase(TestCase):
         #Should redirect to admin view
         #self.assertTemplateUsed(response, 'feed.html')
 
-    def test_admin_access_update_request_page(self):
-        request = self.factory.get('/update_request')
-        request.user = self.user
-        response = update_request(request)
-        self.assertEqual(response.status_code, 302)
+    # def test_admin_access_update_request_page(self):
+    #     request = self.factory.get('/update_request')
+    #     request.user = self.user
+    #     response = update_request(request)
+    #     self.assertEqual(response.status_code, 302)
 
 class DirectorPermissionTestCase(TestCase):
     def setUp(self):
@@ -200,8 +200,8 @@ class DirectorPermissionTestCase(TestCase):
         #Should redirect to admin view
         #self.assertTemplateUsed(response, 'feed.html')
 
-    def test_director_access_update_request_page(self):
-        request = self.factory.get('/update_request')
-        request.user = self.user
-        response = update_request(request)
-        self.assertEqual(response.status_code, 302)
+    # def test_director_access_update_request_page(self):
+    #     request = self.factory.get('/update_request')
+    #     request.user = self.user
+    #     response = update_request(request)
+    #     self.assertEqual(response.status_code, 302)
