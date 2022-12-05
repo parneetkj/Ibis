@@ -30,32 +30,28 @@ class PendingRequestsViewTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'pending_requests.html')
-        form = response.context['form']
-        self.assertTrue(isinstance(form, RequestForm))
-        self.assertFalse(form.is_bound)
-
-    def test_get_pending_requests_redirects_when_is_student(self):
+    
+    def test_pending_requests_shows_student_only_their_requests(self):
         self.client.login(username=self.user.username, password='Password123')
-        request_url = reverse('pending_requests')
-        redirect_url = reverse('feed')
-        response = self.client.get(request_url, follow=True)
-        self.assertRedirects(response, redirect_url,
-            status_code=302, target_status_code=200, fetch_redirect_response=True
-        )
-        self.assertTemplateUsed(response, 'feed.html')
-        messages_list = list(response.context['messages'])
-        self.assertEqual(len(messages_list), 1)
+        other_user = User.objects.get(username='janedoe@example.org')
+        create_requests(other_user, 10, 20)
+        create_requests(self.user, 30, 40)
+        response = self.client.get(self.url)
+        for count in range (10,20):
+            self.assertNotContains(response, f'Topic__{count}')
+        for count in range (30,40):
+            self.assertContains(response, f'Topic__{count}')
 
-    def test_pending_requests_shows_all_requests(self):
+    def test_pending_requests_shows_admin_all_requests(self):
         self.client.login(username=self.admin.username, password='Password123')
         other_user = User.objects.get(username='janedoe@example.org')
         create_requests(other_user, 10, 20)
         create_requests(self.user, 30, 40)
         response = self.client.get(self.url)
         for count in range (10,20):
-            self.assertContains(response, f'{count}')
+            self.assertContains(response, f'Topic__{count}')
         for count in range (30,40):
-            self.assertContains(response, f'{count}')
+            self.assertContains(response, f'Topic__{count}')
 
     def test_get_pending_request_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('log_in', self.url)

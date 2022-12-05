@@ -1,0 +1,35 @@
+<div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+    <div class="col-lg-4 d-flex align-items-stretch">
+        <div class="card mb-4 rounded-3 shadow-sm">
+            <h4 class="card-header py-3">Pending Request</h4>
+            <div class="card-body">
+                <p class="lead">There are currently {{requests}} pending request(s). You can create a new booking for any of them.</p>
+            </div>
+            <div class="card-header">
+                <a href="{%url 'pending_requests'%}" type="button" class="w-100 btn btn-lg btn-outline-primary">See pending requests</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 d-flex align-items-stretch">
+        <div class="card mb-4 rounded-3 shadow-sm">
+            <h4 class="card-header py-3">Bookings</h4>
+            <div class="card-body">
+                <p class="lead"> There are currently {{bookings}} booking(s). You can edit, delete or view an invoice for any of them.</p>
+            </div>
+            <div class="card-header">
+                <a href="{%url 'bookings'%}" type="button" class="w-100 btn btn-lg btn-outline-primary">See all bookings</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 d-flex align-items-stretch">
+        <div class="card mb-4 rounded-3 shadow-sm">
+            <h4 class="card-header py-3">Add Transfer</h4>
+            <div class="card-body">
+                <p class="lead">You can add an incoming transfer for any student.</p>
+            </div>
+            <div class="card-header">
+                <a href="#" type="button" class="w-100 btn btn-lg btn-outline-primary">Add a transfer</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -13,7 +13,6 @@ class BookingTestCase(TestCase):
         self.user = User.objects.get(username='johndoe@example.org')
 
         self.form_input = {
-            'student':self.user,
             'day':'Monday',
             'time':'14:30',
             'start_date':'2022-11-16',
@@ -31,7 +30,6 @@ class BookingTestCase(TestCase):
 
     def test_form_has_necessary_fields(self):
         form = BookingForm()
-        self.assertIn('student', form.fields)
         self.assertIn('day', form.fields)
         self.assertIn('time', form.fields)
         self.assertIn('start_date', form.fields)
@@ -46,26 +44,12 @@ class BookingTestCase(TestCase):
         no_of_lessons = form.fields['no_of_lessons']
         self.assertTrue(isinstance(no_of_lessons, forms.IntegerField))
         self.assertIn('topic', form.fields)
-        self.assertIn('cost', form.fields)
-        
+
+    def test_form_does_not_have_student_field(self):
+        form = BookingForm()
+        self.assertNotIn('student', form.fields)
+
     def test_form_uses_model_validation(self):
         self.form_input['duration'] = 61
         form = BookingForm(data=self.form_input)
         self.assertFalse(form.is_valid())
-
-    def test_form_must_save_correctly(self):
-        form = BookingForm(data=self.form_input)
-        before_count = Booking.objects.count()
-        form.save()
-        after_count = Booking.objects.count()
-        self.assertEqual(after_count, before_count+1)
-        booking = Booking.objects.get(student=self.user)
-        self.assertEqual(booking.day, "Monday")
-        self.assertEqual(booking.time, datetime.time(14, 30))
-        self.assertEqual(booking.start_date, datetime.date(2022, 11, 16))
-        self.assertEqual(booking.duration, 30)
-        self.assertEqual(booking.interval, 1)
-        self.assertEqual(booking.no_of_lessons, 4)
-        self.assertEqual(booking.teacher, 'Mrs.Smith')
-        self.assertEqual(booking.topic, 'Violin')
-        self.assertEqual(booking.cost, 14.50)

@@ -4,7 +4,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator, StepVal
 from django.utils import timezone
 
 class User(AbstractUser):
-    """User model used for authentication and microblogs authoring."""
+    """User model used for authentication and lessons authoring."""
 
     username = models.EmailField(
         unique=True,
@@ -25,11 +25,11 @@ class User(AbstractUser):
         self.balance += amount
         self.save()
         return self.balance
+
     def decrease_balance(self,amount):
         self.balance -= amount
         self.save()
         return self.balance
-
 
 class Request(models.Model):
     """Requests by students"""
@@ -99,7 +99,16 @@ class Booking(models.Model):
 
     student = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    day = models.CharField(max_length=10, blank=False)
+    DAY_CHOICES = [
+    ('Monday', 'Monday'),
+    ('Tuesday', 'Tuesday'),
+    ('Wednesday', 'Wednesday'),
+    ('Thursday', 'Thursday'),
+    ('Friday', 'Friday'),
+    ('Saturday', 'Saturday'),
+    ('Sunday', 'Sunday'),
+    ]
+    day = models.CharField(max_length=10, blank=False, choices=DAY_CHOICES)
 
     time = models.TimeField(blank=False)
 

@@ -1,0 +1,41 @@
+<div class="row row-cols-1 mb-3">
+    <div class="card mb-4 rounded-3">
+    <h4 class="card-body py-3">Your current balanace is £ {{user.balance}} </h4>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+    <div class="col-lg-4 d-flex align-items-stretch">
+        <div class="card mb-4 rounded-3 shadow-sm">
+            <h4 class="card-header py-3">New Request</h4>
+            <div class="card-body">
+                <p class="lead">Once you make a request, you can view them in pending requests.</p>
+            </div>
+            <div class="card-header">
+                <a href="{%url 'new_request'%}" type="button" class="w-100 btn btn-lg btn-outline-primary">Make a new request</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 d-flex align-items-stretch">
+        <div class="card mb-4 rounded-3 shadow-sm">
+            <h4 class="card-header py-3">Pending Requests</h4>
+            <div class="card-body">
+                <p class="lead"> You have {{requests}} pending requests. You can edit or delete your request until it had been fufilled by an administrator.</p>
+            </div>
+            <div class="card-header">
+                <a href="{%url 'pending_requests'%}" type="button" class="w-100 btn btn-lg btn-outline-primary">See pending requests</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 d-flex align-items-stretch">
+        <div class="card mb-4 rounded-3 shadow-sm">
+            <h4 class="card-header py-3">Bookings</h4>
+            <div class="card-body">
+                <p class="lead">You have {{bookings}} bookings. You can also see your invoice for each booking.</p>
+            </div>
+            <div class="card-header">
+                <a href="{%url 'bookings'%}" type="button" class="w-100 btn btn-lg btn-outline-primary">See your bookings</a>
+            </div>
+        </div>
+    </div>
+</div>
