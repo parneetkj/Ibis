@@ -31,8 +31,9 @@ class AddTransferViewTestCase(TestCase):
         self.bookingData.save()
         self.InvoiceData = Invoice(
             booking = self.bookingData,
-            price=300.25,
-            is_paid=False
+            total_price=300.25,
+            is_paid=False,
+            part_payment =0,
         )
         self.InvoiceData.save()
 

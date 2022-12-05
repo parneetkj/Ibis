@@ -24,34 +24,31 @@ class SubmitTransferViewTestCase(TestCase):
             interval=1,
             duration=30,
             teacher='Mrs.Smith',
-            topic = "violin"
+            topic = "violin",
+            cost=14.50
         )
-        self.bookingData.save()
-        self.InvoiceData = Invoice(
-            booking = self.bookingData,
-            price=300.25,
-            is_paid=False
-        )
-        self.InvoiceData.save()
 
+        self.bookingData.save()
+        self.bookingData.generate_invoice()
+        self.InvoicePK = Invoice.objects.get(booking=self.bookingData).pk
+        self.InvoicePrice = Invoice.objects.get(booking=self.bookingData).total_price
         self.form_input = {
-            'amount_paid' : 300.25
+            'amount_paid' : 116
         }
 
     def test_submit_transfer_saves_correctly(self):
-        #TEST REMOVE WHEN GENERATE INVOICE IS IMPLEMENTED
-        User.objects.get(username=self.user.username).decrease_balance(300.25)
-        #-----------------------------------------------
         self.client.login(username=self.admin.username, password='Password123')
         before_count = Invoice.objects.count()
         before_amount = User.objects.get(username=self.user.username).balance
-        transfer_url = reverse('submit_transfer', kwargs={'invoice_id': self.InvoiceData.pk})
+        transfer_url = reverse('submit_transfer', kwargs={'invoice_id': self.InvoicePK})
         response = self.client.post(transfer_url, self.form_input, follow=True)
+
         after_count = Invoice.objects.count()
         after_amount = User.objects.get(username=self.user.username).balance
         self.assertEqual(after_count, before_count)
-        self.assertNotEqual(before_amount,after_amount)
+        self.assertEqual(before_amount,-116)
         self.assertEqual(0, after_amount)
+        self.assertNotEqual(after_amount, before_amount)
         response_url = reverse('bookings')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'bookings.html')
@@ -59,24 +56,23 @@ class SubmitTransferViewTestCase(TestCase):
         self.assertEqual(len(messages_list), 1)
 
         invoice = Invoice.objects.get(booking = self.bookingData)
-        self.assertEqual(invoice.price, 300.25)
+        self.assertEqual(invoice.total_price, 116)
         self.assertTrue(invoice.is_paid)
 
     def test_submit_transfer_saves_correctly_with_less_than_invoice_amount(self):
-        #TEST REMOVE WHEN GENERATE INVOICE IS IMPLEMENTED
-        User.objects.get(username=self.user.username).decrease_balance(300.25)
-        #-----------------------------------------------
-        self.form_input['amount_paid'] = 150.25
+        self.form_input['amount_paid'] = 100
         self.client.login(username=self.admin.username, password='Password123')
         before_count = Invoice.objects.count()
         before_amount = User.objects.get(username=self.user.username).balance
-        transfer_url = reverse('submit_transfer', kwargs={'invoice_id': self.InvoiceData.pk})
+        transfer_url = reverse('submit_transfer', kwargs={'invoice_id': self.InvoicePK})
         response = self.client.post(transfer_url, self.form_input, follow=True)
+
         after_count = Invoice.objects.count()
         after_amount = User.objects.get(username=self.user.username).balance
         self.assertEqual(after_count, before_count)
-        self.assertNotEqual(before_amount,after_amount)
-        self.assertEqual(-150.0, after_amount)
+        self.assertEqual(before_amount,-116)
+        self.assertEqual(before_amount, after_amount)
+
         response_url = reverse('bookings')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'bookings.html')
@@ -84,25 +80,25 @@ class SubmitTransferViewTestCase(TestCase):
         self.assertEqual(len(messages_list), 1)
 
         invoice = Invoice.objects.get(booking = self.bookingData)
-        self.assertEqual(invoice.price, 300.25)
+        self.assertEqual(invoice.total_price, 116)
+        self.assertEqual(invoice.part_payment, 100)
         self.assertFalse(invoice.is_paid)
-        self.assertIsNotNone(invoice.date_paid)
     
     def test_submit_transfer_saves_correctly_with_more_than_invoice_amount(self):
-        #TEST REMOVE WHEN GENERATE INVOICE IS IMPLEMENTED
-        User.objects.get(username=self.user.username).decrease_balance(300.25)
-        #-----------------------------------------------
-        self.form_input['amount_paid'] = 400
+        self.form_input['amount_paid'] = 150
         self.client.login(username=self.admin.username, password='Password123')
         before_count = Invoice.objects.count()
         before_amount = User.objects.get(username=self.user.username).balance
-        transfer_url = reverse('submit_transfer', kwargs={'invoice_id': self.InvoiceData.pk})
+        transfer_url = reverse('submit_transfer', kwargs={'invoice_id': self.InvoicePK})
         response = self.client.post(transfer_url, self.form_input, follow=True)
+
         after_count = Invoice.objects.count()
         after_amount = User.objects.get(username=self.user.username).balance
         self.assertEqual(after_count, before_count)
-        self.assertNotEqual(before_amount,after_amount)
-        self.assertEqual(99.75, after_amount)
+        self.assertEqual(before_amount,-116)
+        self.assertNotEqual(before_amount, after_amount)
+        self.assertEqual(after_amount,34)
+
         response_url = reverse('bookings')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'bookings.html')
@@ -110,7 +106,8 @@ class SubmitTransferViewTestCase(TestCase):
         self.assertEqual(len(messages_list), 1)
 
         invoice = Invoice.objects.get(booking = self.bookingData)
-        self.assertEqual(invoice.price, 300.25)
+        self.assertEqual(invoice.total_price, 116)
+        self.assertEqual(invoice.part_payment, 0)
         self.assertTrue(invoice.is_paid)
         self.assertIsNotNone(invoice.date_paid)
     
@@ -128,7 +125,7 @@ class SubmitTransferViewTestCase(TestCase):
 
     def test_redirect_when_student_logged_in(self):
         self.client.login(username=self.user.username, password='Password123')
-        transfer_url = reverse('submit_transfer', kwargs={'invoice_id': self.InvoiceData.pk})
+        transfer_url = reverse('submit_transfer', kwargs={'invoice_id': self.InvoicePK})
         redirect_url = reverse('feed')
         response = self.client.post(transfer_url, self.form_input, follow=True)
         self.assertRedirects(response, redirect_url,
@@ -139,7 +136,7 @@ class SubmitTransferViewTestCase(TestCase):
         self.assertEqual(len(messages_list), 1)
 
     def test_submit_transfer_get_request_is_forbidden(self):
-        transfer_url = reverse('submit_transfer', kwargs={'invoice_id': self.InvoiceData.pk})
+        transfer_url = reverse('submit_transfer', kwargs={'invoice_id': self.InvoicePK})
         self.client.login(username=self.admin.username, password='Password123')
         response = self.client.get(transfer_url, follow=True)
         self.assertEqual(response.status_code, 403)
@@ -147,7 +144,7 @@ class SubmitTransferViewTestCase(TestCase):
     def test_form_is_validated_correctly(self):
         self.form_input['amount_paid'] = "Apple"
         self.client.login(username=self.admin.username, password='Password123')
-        transfer_url = reverse('submit_transfer', kwargs={'invoice_id': self.InvoiceData.pk})
+        transfer_url = reverse('submit_transfer', kwargs={'invoice_id': self.InvoicePK})
         response = self.client.post(transfer_url, self.form_input, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'add_transfer.html')
