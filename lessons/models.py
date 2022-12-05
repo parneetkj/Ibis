@@ -94,7 +94,16 @@ class Booking(models.Model):
 
     student = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    day = models.CharField(max_length=10, blank=False)
+    DAY_CHOICES = [
+    ('Monday', 'Monday'),
+    ('Tuesday', 'Tuesday'),
+    ('Wednesday', 'Wednesday'),
+    ('Thursday', 'Thursday'),
+    ('Friday', 'Friday'),
+    ('Saturday', 'Saturday'),
+    ('Sunday', 'Sunday'),
+    ]
+    day = models.CharField(max_length=10, blank=False, choices=DAY_CHOICES)
 
     time = models.TimeField(blank=False)
 
