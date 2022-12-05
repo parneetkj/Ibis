@@ -167,11 +167,33 @@ class Booking(models.Model):
     )
     
     def generate_invoice(self):
-        Invoice.objects.create(booking=self, price=(self.cost*(self.duration/60)*self.no_of_lessons), is_paid=False, date_paid=None)    
+        Invoice.objects.create(booking=self, price=self.get_price, is_paid=False, date_paid=None)    
+
+    def edit_invoice(self):
+        invoice = Invoice.objects.get(booking=self)
+        new_price = self.get_price()
+
+        if(invoice.price < new_price):
+            # The new price is more expensive than the original
+            self.student.increase_balance(invoice.price)
+            self.student.decrease_balance(new_price)
+            invoice.price=new_price
+            invoice.is_paid=False
+            invoice.date_paid= None
+            invoice.save()
+        elif (invoice.price > new_price):
+            # The new price is cheaper than the original payment
+            self.student.increase_balance(invoice.price)
+            self.student.decrease_balance(new_price)
+            invoice.price=new_price
+            invoice.save()
+
+    def get_price(self):
+        return self.cost*(60/self.duration)*self.no_of_lessons
 
 class Invoice(models.Model):
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE, blank=False)
     price = models.FloatField(blank=False)
     is_paid = models.BooleanField(default=False)
-    date_paid = models.DateTimeField(auto_now_add=True, blank=True)
+    date_paid = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
