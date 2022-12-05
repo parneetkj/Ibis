@@ -26,7 +26,6 @@ class RequestForm(forms.ModelForm):
             if (date == timezone.now().date() and time <= timezone.now().time()):
                 self.add_error('time','Time must be in the future.')
 
-
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking    
@@ -93,8 +92,9 @@ class SignUpForm(forms.ModelForm):
         return user
 
 class TransferForm(forms.Form):
-    amount_paid = forms.FloatField(
-        label='Amount paid:',
+    student = forms.ModelChoiceField(queryset=User.objects.filter(is_student=True))
+    amount = forms.DecimalField(
+        label='Amount Paid:',
         min_value=0,
         step_size=0.01
-    )
+        )
