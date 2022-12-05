@@ -112,7 +112,7 @@ def new_request(request):
         form = RequestForm(request.POST)
         if form.is_valid():
             Request.objects.create(
-                student=pending_request.student,
+                student=request.user,
                 date=form.cleaned_data.get('date'),
                 time=form.cleaned_data.get('time'),
                 amount=form.cleaned_data.get('amount'),
@@ -122,8 +122,6 @@ def new_request(request):
                 teacher=form.cleaned_data.get('teacher')
             )
 
-            booking_request = Booking.objects.all().latest('id')
-            booking_request.generate_invoice()
             return redirect('pending_requests')
             #return render(request, 'pending_requests.html', {'requests' : requests})
         else:
