@@ -175,7 +175,7 @@ def pending_requests(request):
 @login_required
 @admin_required
 def new_booking(request, id):
-    if Request.objects.get(id=id):
+    if Request.objects.filter(id=id).exists():
         pending_request = Request.objects.get(id=id)
         if request.method == 'POST':
             form = BookingForm(instance = pending_request, data = request.POST)
