@@ -15,20 +15,26 @@
         <td style="width:40%">
             {% if invoice.is_paid %}
                 <div class="alert alert-success" role="alert">
-                    Paid!
+                    <P>Paid!</p>
+                    <p>{{invoice.date_paid}}</p>
+                </div>
+            {%elif invoice.part_payment > 0%}
+                <div class="alert alert-warning" role="alert">
+                    <p>Paid in Part</p>
+                    <p> Part-Payments: £{{invoice.part_payment}}</p>
                 </div>
             {%else%}
-                <div class="alert alert-danger" role="alert">
-                    Not Paid!
-                </div>
+            <div class="alert alert-danger" role="alert">
+                Not Paid!
+            </div>
             {%endif%}
         </td>
     </tr>
     <tr>
         {% if invoice.is_paid %}
-            <h2>£{{invoice.price}} was paid on the {{invoice.date_paid}}</h2>
+            <h2>£{{invoice.total_price}}</h2>
         {%else%}
-            <h2>Total to pay: £{{invoice.price}} </h2> 
+            <h2>Total to pay: £{{invoice.total_price}} </h2> 
         {%endif%}
     </tr>
 </table>
