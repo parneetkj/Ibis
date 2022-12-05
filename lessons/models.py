@@ -161,3 +161,26 @@ class Booking(models.Model):
 
     def generate_invoice():
         pass
+
+class Term(models.Model):
+    """ Term model for music school """
+
+    start_date = models.DateField(blank=False)
+    end_date = models.DateField(blank=False)
+
+    def save(self, *args, **kwargs):
+        # get number of items that have an overlapping start date
+        overlap_start = Term.objects.filter(start_date__gte=self.start_date, start_date__lte=self.end_date).count()
+        
+        # get number of items that have an overlapping end date
+        overlap_end = Term.objects.filter(end_date__gte=self.start_date, end_date__lte=self.end_date).count()
+
+        if (overlap_start > 0) or (overlap_end > 0):
+            overlap_present = True
+        else:
+            overlap_present = False
+
+        if overlap_present:
+            return 
+        else:
+            super(Term, self).save(*args, **kwargs) # Call the "real" save() method.
