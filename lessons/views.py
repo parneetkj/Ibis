@@ -182,7 +182,7 @@ def new_booking(request, id):
         form = BookingForm(instance = pending_request, data = request.POST)
         if form.is_valid():
             Booking.objects.create(
-                student=request.user,
+                student=pending_request.student,
                 day=form.cleaned_data.get('day'),
                 time=form.cleaned_data.get('time'),
                 start_date=form.cleaned_data.get('start_date'),
@@ -225,6 +225,7 @@ def update_booking(request, id):
         if (form.is_valid()):
             messages.add_message(request, messages.SUCCESS, "Booking successfully updated!")
             form.save()
+            booking_request.edit_invoice()
             return redirect('bookings')
         else:
             return render(request, 'update_booking.html', {'form': form, 'request' : booking_request})
