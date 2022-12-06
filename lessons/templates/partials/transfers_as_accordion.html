@@ -7,6 +7,7 @@
     </h2>
     <div id="transfer_collapse_{{transfer.pk}}" class="accordion-collapse collapse" aria-labelledby="transfer_{{transfer.pk}}" data-bs-parent="#TransfersACC">
         <div class="accordion-body">
+            <p><strong>Invoice ID: </strong> {{transfer.invoice.booking.student.pk}} - {{transfer.invoice.booking.pk}}</p>
             <p><strong>Transfer of: </strong> £{{transfer.amount}}</p>
             <p><strong>Date & Time: </strong> {{transfer.date}}</p>
         </div>

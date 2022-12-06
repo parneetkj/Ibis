@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponseForbidden
 from .models import Request, Booking, Invoice, Transfer, User
-from .helpers import get_user_requests, get_all_requests, get_user_bookings, get_all_bookings, get_all_transfers, check_for_refund, get_user_transfers, get_all_invoices, create_transfer
+from .helpers import get_user_requests, get_all_requests, get_user_bookings, get_all_bookings, get_user_transfers, create_transfer, get_user_invoices, calculate_student_balance, get_invoice_transfers
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm, RequestForm, BookingForm, TransferForm, SelectStudentForm
 from django.contrib.auth import login, logout
@@ -12,9 +11,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views import View
 from django.views.generic.edit import FormView
 from django.urls import reverse
-from django.utils import timezone
 from django.core.exceptions import PermissionDenied
-from decimal import Decimal
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
@@ -98,6 +95,7 @@ def home_page(request):
 @login_required
 def feed(request):
     if request.user.is_student:
+        calculate_student_balance(request.user)
         requests = len(get_user_requests(request.user))
         bookings = len(get_user_bookings(request.user))
     else:
@@ -200,6 +198,7 @@ def new_booking(request, id):
             )
             booking_request = Booking.objects.all().latest('id')
             booking_request.generate_invoice()
+            calculate_student_balance(booking_request.student)
             Request.objects.filter(id=id).delete()
             messages.add_message(request, messages.SUCCESS, "Booking successfully created!")
             return redirect('feed')
@@ -232,8 +231,8 @@ def update_booking(request, id):
         if (form.is_valid()):
             messages.add_message(request, messages.SUCCESS, "Booking successfully updated!")
             form.save()
-            check_for_refund(Booking.objects.get(pk=id))
-            Booking.objects.get(pk=id).edit_invoice()
+            Invoice.objects.get(booking=booking_request).change_invoice_amount()
+            calculate_student_balance(booking_request.student)
             return redirect('bookings')
         else:
             return render(request, 'update_booking.html', {'form': form, 'request' : booking_request})
@@ -250,8 +249,9 @@ def delete_booking(request, id):
         messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")    
         return redirect('bookings')
    
-    check_for_refund(booking)
+    student = booking.student
     booking.delete()
+    calculate_student_balance(student)
     messages.add_message(request, messages.SUCCESS, "Booking deleted!")
     return redirect('bookings')
 
@@ -312,14 +312,13 @@ def student_transfers(request, student_id=None):
             student = User.objects.get(id=request.user.pk)
         else:
             student = User.objects.get(id=student_id)
-        user_bookings = get_user_bookings(student)
-        user_invoices = Invoice.objects.filter(booking__in=user_bookings)
-        user_transfers = Transfer.objects.filter(invoice__in=user_invoices)
+        user_invoices = get_user_invoices(student)
+        user_transfers = get_user_transfers(student)
     except:
         messages.add_message(request, messages.ERROR, "Sorry, could not find your data.")
         return redirect('bookings')
 
-    return render(request, 'student_transfers.html', {'transfers' : user_transfers,'invoices':user_invoices})
+    return render(request, 'student_transfers.html', {'transfers' : user_transfers,'invoices':user_invoices, 'student':student})
 
 
 @login_required
@@ -334,11 +333,16 @@ def pay_invoice(request, invoice_id):
     if request.method == 'POST':
         form = TransferForm(request.POST)
         if form.is_valid():
+            if(invoice.is_paid):
+                return render(request, 'view_invoice.html', {'invoice' : invoice, 'form':form})
             create_transfer(invoice, form.cleaned_data.get('amount'))
             invoice.check_if_paid()
+            calculate_student_balance(invoice.booking.student) 
             invoice = Invoice.objects.get(id=invoice_id)
             form = TransferForm()
-            return render(request, 'view_invoice.html', {'invoice' : invoice, 'form':form})
+            transfers = get_invoice_transfers(invoice)
+            return render(request, 'view_invoice.html', {'invoice' : invoice, 'transfers':transfers, 'form':form})
     else:
         form = TransferForm()
+        transfers = get_invoice_transfers(invoice)
         return render(request, 'view_invoice.html', {'invoice' : invoice, 'form':form})

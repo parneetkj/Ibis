@@ -28,19 +28,34 @@ def get_all_transfers():
 
 def get_all_invoices():
     return Invoice.objects.all()
-    
-def check_for_refund(booking):
-    invoice = Invoice.objects.get(booking=booking)
-    if invoice.is_paid:
-        booking.student.increase_balance(invoice.total_price)
+
+def get_user_invoices(user):
+    user_bookings = get_user_bookings(user)
+    user_invoices = Invoice.objects.filter(booking__in=user_bookings)
+    return user_invoices
 
 def get_user_transfers(user):
-    return Transfer.objects.filter(student=user)
+    user_invoices = get_user_invoices(user)
+    user_transfers = Transfer.objects.filter(invoice__in=user_invoices)
+    return user_transfers
+
+def get_invoice_transfers(invoice):
+    return Transfer.objects.filter(invoice=invoice)
 
 def create_transfer(invoice,amount):
     Transfer.objects.create(invoice=invoice,amount=amount)
     invoice.add_partial_payment(amount)
 
+def calculate_student_balance(user):
+    user_invoices = get_user_invoices(user)
+
+    total_bill = 0
+    total_paid = 0
+    for invoice in user_invoices:
+        total_bill += invoice.total_price
+        total_paid += invoice.partial_payment
+
+    user.set_balance(round(total_paid-total_bill,2))
 class LogInTester:
     def _is_logged_in(self):
         return '_auth_user_id' in self.client.session.keys()

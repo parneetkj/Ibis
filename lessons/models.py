@@ -21,15 +21,9 @@ class User(AbstractUser):
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 
-    def increase_balance(self,amount):
-        self.balance = round(self.balance + amount,2)
+    def set_balance(self,amount):
+        self.balance = amount
         self.save()
-        return self.balance
-
-    def decrease_balance(self,amount):
-        self.balance = round(self.balance - amount,2)
-        self.save()
-        return self.balance
 
 class Request(models.Model):
     """Requests by students"""
@@ -171,14 +165,6 @@ class Booking(models.Model):
     def generate_invoice(self):
         Invoice.objects.create(booking=self, total_price=self.get_price,date_paid=None)
 
-    def edit_invoice(self):
-        invoice = Invoice.objects.get(booking=self)
-        invoice.total_price = self.get_price
-        invoice.is_paid = False
-        invoice.date_paid = None
-        invoice.save()
-
-
     @property
     def get_price(self):
         return Decimal(float(self.cost)*(60/self.duration)*self.no_of_lessons)
@@ -198,6 +184,13 @@ class Invoice(models.Model):
             self.is_paid = True
             self.date_paid = timezone.now()
             self.save()
+
+    def change_invoice_amount(self):
+        self.total_price = self.booking.get_price
+        if self.partial_payment < self.total_price:
+            self.is_paid = False
+            self.date_paid = None
+        self.save()
 class Transfer(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     amount = models.DecimalField(blank=False, max_digits=10, decimal_places=2)
