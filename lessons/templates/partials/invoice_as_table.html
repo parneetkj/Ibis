@@ -19,9 +19,12 @@
                     <p>{{invoice.date_paid}}</p>
                 </div>
             {%else%}
-            <div class="alert alert-danger" role="alert">
-                Not Paid!
-            </div>
+                <div class="alert alert-danger" role="alert">
+                    Not Paid!
+                </div>
+                {% if user.is_student %}
+                    <a href="{%url 'pay_invoice' invoice.booking.id %}" type="button" class="btn btn-success">Pay Invoice</a>
+                {%endif%}
             {%endif%}
         </td>
     </tr>

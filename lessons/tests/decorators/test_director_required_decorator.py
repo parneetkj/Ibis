@@ -62,4 +62,3 @@ class StudentRequiredTestCase(TestCase):
         request.user = self.student
         response = a_view(request)
         self.assertEqual(response.status_code, 302)
-        

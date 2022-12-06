@@ -26,24 +26,6 @@ def get_all_bookings():
 def get_all_transfers():
     return Transfer.objects.all()
 
-def adjust_student_balance(student, transfer_amount):
-    user_bookings = get_user_bookings(student)
-    unpaid_invoices = Invoice.objects.filter(is_paid=False).filter(booking__in=user_bookings)
-    remaining_transfer_amount = transfer_amount
-    paid_invoice_total = 0
-    for invoice in unpaid_invoices:
-        if (transfer_amount >= invoice.total_price) or (transfer_amount + student.balance >= invoice.total_price):
-            invoice.is_paid = True
-            invoice.date_paid = timezone.now()
-            invoice.save()
-            remaining_transfer_amount -= invoice.total_price
-            paid_invoice_total += invoice.total_price
-
-    if(transfer_amount != 0):
-        student.increase_balance(transfer_amount)
-    else:
-        student.decrease_balance(paid_invoice_total)
-
 def check_for_refund(booking):
     invoice = Invoice.objects.get(booking=booking)
     if invoice.is_paid:

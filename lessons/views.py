@@ -1,7 +1,11 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
 from .models import Request, Booking, Invoice, Transfer, User
+<<<<<<< HEAD
 from .helpers import get_user_requests, get_all_requests, get_user_bookings, get_all_bookings, get_all_transfers, adjust_student_balance, check_for_refund
+=======
+from .helpers import get_user_requests, get_all_requests, get_user_bookings, get_all_bookings, get_all_transfers, check_for_refund
+>>>>>>> main
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm, RequestForm, BookingForm, TransferForm, CreateAdminForm, UpdateAdminForm
 from django.contrib.auth import login, logout
@@ -200,7 +204,6 @@ def new_booking(request, id):
             )
             booking_request = Booking.objects.all().latest('id')
             booking_request.generate_invoice()
-            adjust_student_balance(pending_request.student,0)
             Request.objects.filter(id=id).delete()
             messages.add_message(request, messages.SUCCESS, "Booking successfully created!")
             return redirect('feed')
@@ -233,7 +236,8 @@ def update_booking(request, id):
         if (form.is_valid()):
             messages.add_message(request, messages.SUCCESS, "Booking successfully updated!")
             form.save()
-            booking_request.edit_invoice()
+            check_for_refund(Booking.objects.get(pk=id))
+            Booking.objects.get(pk=id).edit_invoice()
             return redirect('bookings')
         else:
             return render(request, 'update_booking.html', {'form': form, 'request' : booking_request})
@@ -289,8 +293,8 @@ def transfers(request):
                 amount = Decimal(form.cleaned_data.get('amount')),
                 date = timezone.now()
             )
-            adjust_student_balance(form.cleaned_data.get('student'),form.cleaned_data.get('amount'))
             messages.add_message(request, messages.SUCCESS, "Transfer Added!")
+            form.cleaned_data.get('student').increase_balance(Decimal(form.cleaned_data.get('amount')))
             form = TransferForm()
             return render(request, 'transfers.html', {'transfers' : transfers, 'form' : form})
         else:
@@ -298,6 +302,32 @@ def transfers(request):
     else:
         form = TransferForm()
         return render(request, 'transfers.html', {'transfers' : transfers, 'form' : form})
+
+@login_required
+@student_required
+def pay_invoice(request, booking_id):
+    try:
+        booking = Booking.objects.get(id=booking_id)
+        student = booking.student
+        invoice = Invoice.objects.get(booking=booking)
+    except:
+        messages.add_message(request, messages.ERROR, "Sorry, could not locate the invoice!")
+        return redirect('bookings')
+
+    if request.method == 'GET':
+        if(student.balance >= invoice.total_price):
+            student.decrease_balance(invoice.total_price)
+            invoice.is_paid = True
+            invoice.date_paid = timezone.now()
+            invoice.save()
+            messages.add_message(request, messages.SUCCESS, "Invoice was paid!")
+            invoice = Invoice.objects.get(booking=booking)
+            return render(request, 'view_invoice.html', {'invoice' : invoice})
+        else:
+            messages.add_message(request, messages.WARNING, "Sorry, your balance is too low to pay this invoice")
+            return render(request, 'view_invoice.html', {'invoice' : invoice})
+    else:
+        return render(request, 'view_invoice.html', {'invoice' : invoice})
 
 @login_required
 @director_required

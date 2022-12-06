@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator, StepValueValidator, DecimalValidator
 from decimal import Decimal
+from django.utils import timezone
 class User(AbstractUser):
     """User model used for authentication and lessons authoring."""
 
@@ -169,26 +170,14 @@ class Booking(models.Model):
 
     def generate_invoice(self):
         Invoice.objects.create(booking=self, total_price=self.get_price,date_paid=None)
-        self.student.decrease_balance(self.get_price)
 
     def edit_invoice(self):
         invoice = Invoice.objects.get(booking=self)
-        new_price = self.get_price
+        invoice.total_price = self.get_price
+        invoice.is_paid = False
+        invoice.date_paid = None
+        invoice.save()
 
-        if(invoice.total_price < new_price):
-            # The new price is more expensive than the original
-            self.student.increase_balance(invoice.total_price)
-            self.student.decrease_balance(new_price)
-            invoice.total_price=new_price
-            invoice.is_paid=False
-            invoice.date_paid= None
-            invoice.save()
-        elif (invoice.total_price > new_price):
-            # The new price is cheaper than the original payment
-            self.student.increase_balance(invoice.total_price)
-            self.student.decrease_balance(new_price)
-            invoice.total_price=new_price
-            invoice.save()
 
     @property
     def get_price(self):
