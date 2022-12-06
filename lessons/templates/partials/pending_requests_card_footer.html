@@ -1,7 +1,11 @@
 <!-- Card Footer -->
 <div class="card-footer">
-    <a href="{%url 'update_booking' booking.id %}" type="button" class="btn btn-primary">Edit</a>
-    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmation">Delete</button>
+    {% if user.is_admin%}
+      <a href="{%url 'new_booking' id=request.id%}" type="button" class="btn btn-primary">Book Lesson</a>
+    {% else %}
+      <a href="{%url 'update_request' request.id %}" type="button" class="btn btn-primary">Edit</a>
+      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmation">Delete</button>
+    {% endif %}
 </div>
 
 <!-- Modal -->
@@ -13,11 +17,11 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete this booking?
+                Are you sure you want to delete this request?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <a href="{%url 'delete_booking' booking.id %}" type="button" class="btn btn-primary">Confirm</a>
+                <a href="{%url 'delete_request' request.id %}" type="button" class="btn btn-danger">Confirm</a>
             </div>
         </div>
     </div>

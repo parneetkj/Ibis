@@ -2,6 +2,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from lessons.models import User
+from decimal import Decimal
 
 class UserModelTestCase(TestCase):
     """Unit tests for the User model."""
@@ -81,7 +82,32 @@ class UserModelTestCase(TestCase):
         self.user.last_name = 'x' * 51
         self._assert_user_is_invalid()
 
-    
+
+    def test_balance_starts_at_0(self):
+        self.assertEqual(self.user.balance, 0.00)
+
+    def test_balance_can_increase(self):
+        new_balance = self.user.increase_balance(Decimal(8.56))
+        self.assertEqual(new_balance, self.user.balance)
+        self._assert_user_is_valid()
+        self.user.balance = 0.00
+
+    def test_balance_can_decrease(self):
+        new_balance = self.user.decrease_balance(Decimal(8.58))
+        self.assertEqual(new_balance, self.user.balance)
+        self._assert_user_is_valid()
+        self.user.balance = 0.00
+
+    def test_balance_can_be_negative(self):
+        new_balance = self.user.decrease_balance(Decimal(100.51))
+        self.assertEqual(new_balance, self.user.balance)
+        self._assert_user_is_valid()
+        self.user.balance = 0.00
+
+    def test_full_name_returns_correctly(self):
+        self.assertEqual(self.user.full_name, f"{self.user.first_name} {self.user.last_name}")
+
+
     def _assert_user_is_valid(self):
         try:
             self.user.full_clean()

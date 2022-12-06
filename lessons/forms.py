@@ -17,19 +17,20 @@ class RequestForm(forms.ModelForm):
         date = self.cleaned_data.get('date')
         if (date == None):
             return
+
+        time = self.cleaned_data.get('time')
+        if (time == None):
+            return
+
         if(date <= timezone.now().date()):
             self.add_error('date','Date must be in the future.')
-            time = self.cleaned_data.get('time')
-            if (time == None):
-                return
             if (date == timezone.now().date() and time <= timezone.now().time()):
                 self.add_error('time','Time must be in the future.')
-
 
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
-        exclude = ['status']
+        exclude = ['student']
 
 class LogInForm(forms.Form):
     """Form enabling registered users to log in."""
@@ -139,12 +140,21 @@ class CreateAdminForm(forms.ModelForm):
         )
         return user
 
+class TransferForm(forms.Form):
+    student = forms.ModelChoiceField(queryset=User.objects.filter(is_student=True))
+    amount = forms.DecimalField(
+        label='Amount Paid:',
+        min_value=0,
+        step_size=0.01
+        )
+
 class UpdateAdminForm(forms.ModelForm):
 
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'username','is_director']
 
+        
     password = forms.CharField(
         label='Password',
         widget=forms.PasswordInput(),
@@ -160,5 +170,3 @@ class UpdateAdminForm(forms.ModelForm):
 
         for username, field in self.fields.items():
             field.widget.attrs.update({'class': 'input'})
-
-        

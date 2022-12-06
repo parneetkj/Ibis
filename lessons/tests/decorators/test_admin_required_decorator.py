@@ -28,27 +28,21 @@ class StudentRequiredTestCase(TestCase):
         response = a_view(request)
         self.assertEqual(response.status_code, 200)
 
+    def test_director_successfully_accesses_view(self):
+        @admin_required
+        def a_view(request):
+            return HttpResponse()
+        request = self.factory.get('/pending_request')
+        request.user = self.director
+        response = a_view(request)
+        self.assertEqual(response.status_code, 200)
+
     def test_student_unsuccessful_access_view(self):
         @admin_required
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/pending_request')
         request.user = self.student
-        middleware = SessionMiddleware(request)
-        middleware.process_request(request)
-        request.session.save()
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-        response = a_view(request)
-        self.assertEqual(response.status_code, 302)
-
-
-    def test_director_unsuccessful_access_view(self):
-        @admin_required
-        def a_view(request):
-            return HttpResponse()
-        request = self.factory.get('/pending_request')
-        request.user = self.director
         middleware = SessionMiddleware(request)
         middleware.process_request(request)
         request.session.save()

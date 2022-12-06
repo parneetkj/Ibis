@@ -21,7 +21,6 @@ class NewBookingViewTestCase(TestCase):
         self.requests = Request.objects.filter()
 
         self.data = {
-            'student':self.user,
             'day':'Monday',
             'time':'14:30',
             'start_date':'2022-11-16',
@@ -29,7 +28,8 @@ class NewBookingViewTestCase(TestCase):
             'interval':1,
             'teacher':'Mrs.Smith',
             'no_of_lessons':4,
-            'topic':'violin'
+            'topic':'violin',
+            'cost': 14.50
         }
         
         self.bookings = Booking.objects.filter()
@@ -64,20 +64,16 @@ class NewBookingViewTestCase(TestCase):
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 1)
 
-    #Add tests for when POST request is used
-    
     def test_successful_new_booking(self):
         self.client.login(username=self.admin.username, password="Password123")
-        response = self.client.post(self.url, self.data, follow=True)
-        form = BookingForm(data=self.data)
         before_count = Booking.objects.count()
-        form.save()
+        response = self.client.post(self.url, self.data, follow=True)
         after_count = Booking.objects.count()
         self.assertEqual(after_count, before_count+1)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'new_booking.html')
-        form = response.context['form']
-        self.assertTrue(isinstance(form, BookingForm))
+        self.assertTemplateUsed(response, 'feed.html')
+        messages_list = list(response.context['messages'])
+        self.assertEqual(len(messages_list), 1)
 
     def test_unsuccessful_new_booking(self):
         self.client.login(username=self.admin.username, password="Password123")
@@ -102,3 +98,15 @@ class NewBookingViewTestCase(TestCase):
             self.assertContains(response, f'Topic__{count}')
         for count in range(300, 300):
             self.assertNotContains(response, f'Topic__{count}')
+
+    def test_redirect_with_incorrect_request_id(self):
+        self.client.login(username=self.admin.username, password='Password123')
+        url = reverse('new_booking', kwargs={'id': (Request.objects.count()) +100})
+        redirect_url = reverse('feed')
+        response = self.client.get(url, follow=True)
+        self.assertRedirects(response, redirect_url,
+            status_code=302, target_status_code=200, fetch_redirect_response=True
+        )
+        self.assertTemplateUsed(response, 'feed.html')
+        messages_list = list(response.context['messages'])
+        self.assertEqual(len(messages_list), 1)
