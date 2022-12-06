@@ -28,7 +28,7 @@ class RequestForm(forms.ModelForm):
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking    
-        exclude = ['student']
+        exclude = ['student', 'no_of_lessons']
 
 class LogInForm(forms.Form):
     """Form enabling registered users to log in."""

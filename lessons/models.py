@@ -89,10 +89,23 @@ class Request(models.Model):
         default = "In Progress"
     )
 
+class Term(models.Model):
+    """ Term model for music school """
+
+    start_date = models.DateField(blank=False)
+    end_date = models.DateField(blank=False)
+
+
 class Booking(models.Model):
     """ Booking by admin """
 
     student = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    term = models.ForeignKey(Term, on_delete=models.CASCADE)
+    
+    start_date = models.DateField(blank=False)
+
+    end_date = models.DateField(blank=False)
 
     DAY_CHOICES = [
     ('Monday', 'Monday'),
@@ -106,8 +119,6 @@ class Booking(models.Model):
     day = models.CharField(max_length=10, blank=False, choices=DAY_CHOICES)
 
     time = models.TimeField(blank=False)
-
-    start_date = models.DateField(blank=False)
 
     DURATION_CHOICES = [
     (15, '15 Minute'),
@@ -139,31 +150,20 @@ class Booking(models.Model):
         max_length=100,
         blank=False
     )
-
-    no_of_lessons = models.IntegerField(
-        blank=False,
-        validators=[
-            MinValueValidator(
-                limit_value=1,
-                message="Must book at least 1 lesson."
-            ),
-            MaxValueValidator(
-                limit_value=50,
-                message="Cannot book more than 50 lessons."
-            )
-        ]
-    )
-
+    
     topic = models.CharField(
         max_length=50,
         blank=False
     )
 
+    no_of_lessons = models.IntegerField(default=0)
+
+
     def generate_invoice():
         pass
 
-class Term(models.Model):
-    """ Term model for music school """
-
-    start_date = models.DateField(blank=False)
-    end_date = models.DateField(blank=False)
+    def calc_no_of_lessons(self):
+        duration = self.end_date - self.start_date
+        duration_in_weeks = duration.days / 7
+        self.no_of_lessons = duration_in_weeks // self.interval
+        self.save()

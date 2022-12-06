@@ -182,15 +182,20 @@ def new_booking(request, id):
             if form.is_valid():
                 Booking.objects.create(
                     student=pending_request.student,
+                    term=form.cleaned_data.get('term'),
+                    start_date=form.cleaned_data.get('start_date'),
+                    end_date=form.cleaned_data.get('end_date'),
                     day=form.cleaned_data.get('day'),
                     time=form.cleaned_data.get('time'),
-                    start_date=form.cleaned_data.get('start_date'),
                     duration=form.cleaned_data.get('duration'),
                     interval=form.cleaned_data.get('interval'),
                     teacher=form.cleaned_data.get('teacher'),
-                    no_of_lessons=form.cleaned_data.get('no_of_lessons'),
                     topic=form.cleaned_data.get('topic'),
                 )
+                booking_request = Booking.objects.all().latest('id')
+                
+                booking_request.calc_no_of_lessons()
+                
                 Request.objects.filter(id=id).delete()
                 return redirect('bookings')
             else:
