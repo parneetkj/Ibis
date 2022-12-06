@@ -14,6 +14,7 @@ from django.views.generic.edit import FormView
 from django.urls import reverse
 from django.views import generic
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.hashers import make_password
 
 def home_page(request):
     return render(request, 'home_page.html')
@@ -261,18 +262,20 @@ def create_admin(request):
     if request.method == 'POST':
         form = CreateAdminForm(request.POST)
         if form.is_valid():
+            messages.add_message(request, messages.SUCCESS, "Admin created!")
             form.save()
             return redirect('manage_admin')
     else:
         form = CreateAdminForm()
     return render(request, 'create_admin.html', {'form': form})
 
-
+@login_required
+@director_required
 def update_admin(request, pk):
     try:
         admin_update = User.objects.get(id=pk)
     except:
-        messages.add_message(request, messages.INFO, "Admin could not be found!")
+        messages.add_message(request, messages.ERROR, "Admin could not be found!")
         return redirect('manage_admin')
 
     if request.method == 'POST':
@@ -280,8 +283,8 @@ def update_admin(request, pk):
         if form.is_valid():
             messages.add_message(request, messages.SUCCESS, "Admin updated!")
             admin_update = form.save(commit=False)
+            admin_update.set_password(form.cleaned_data['password'])
             admin_update.save()
-
             return redirect('manage_admin')
         else:
             messages.add_message(request, messages.INFO, "Error!")

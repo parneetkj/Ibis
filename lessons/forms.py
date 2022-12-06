@@ -99,7 +99,7 @@ class CreateAdminForm(forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['id','first_name', 'last_name', 'username', 'is_director']
+        fields = ['first_name', 'last_name', 'username', 'is_director']
 
 
 
@@ -140,12 +140,20 @@ class CreateAdminForm(forms.ModelForm):
         return user
 
 class UpdateAdminForm(forms.ModelForm):
+
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username','is_director', 'password']
+        fields = ['first_name', 'last_name', 'username','is_director']
 
-
-
+    password = forms.CharField(
+        label='Password',
+        widget=forms.PasswordInput(),
+        validators=[RegexValidator(
+            regex=r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$',
+            message='Password must contain an uppercase character, a lowercase '
+                    'character and a number'
+            )]
+    )
 
     def __init__(self, *args, **kwargs):
         super(UpdateAdminForm, self).__init__(*args, **kwargs)

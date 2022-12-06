@@ -19,13 +19,13 @@ def student_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, log
         return actual_decorator(function)
     return actual_decorator
 
-   
-def admin_required(view_function): 
+
+def admin_required(view_function):
     # Decorator for views that checks that the logged in user is an admin,
     # redirects to the feed page if not.
 
     def modified_view_function(request, *args, **kwargs):
-        if request.user.is_student:
+        if request.user.is_student or request.user.is_director:
             messages.add_message(request, messages.ERROR, "You cannot access this page!")
             return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
         else:

@@ -41,7 +41,7 @@ class TestNewAdminViewTestCase(TestCase):
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
 
-    def test_unsuccesful_creation_of_admin(self):
+    def test_unsuccessful_creation_of_admin(self):
         self.client.login(username=self.user.username, password='Password123')
         self.form_input['username'] = 'BAD_USERNAME'
         before_count = User.objects.count()
@@ -55,7 +55,7 @@ class TestNewAdminViewTestCase(TestCase):
         self.assertTrue(form.is_bound)
 
 
-    def test_succesful_creation_of_admin(self):
+    def test_successful_creation_of_admin(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = User.objects.count()
         response = self.client.post(self.url, self.form_input, follow=True)
