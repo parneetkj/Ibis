@@ -1,0 +1,10 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <h1>Invoice: {{invoice.booking.student.id}}-{{invoice.booking.id}} </h1>
+        {% include 'partials/invoice_as_table.html' with invoice=invoice %}
+    </div>
+    <a href="{%url 'bookings' %}" type="button" class="btn btn-primary">Back</a>
+</div>
+{% endblock %}

@@ -11,6 +11,9 @@
     <li class="nav-item">
       <a class="nav-link" href="{% url 'bookings'%}">Booked Lessons</a>
     </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'transfers'%}">Transfers</a>
+    </li>
   </ul>
   <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
     <li class="nav-item dropdown">
@@ -18,6 +21,7 @@
         <span class="bi-person-circle"></span>
       </a>
       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="user-account-dropdown">
+        <li>Logged in as: <br><b>{{user.full_name}}</b></li>
         <li><hr class="dropdown-divider"></li>
         <li><a class="dropdown-item" href="{% url 'log_out'%}">Log out</a></li>
       </ul>

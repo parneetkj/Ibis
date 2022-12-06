@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
-from .models import Request, Booking
-from .helpers import get_user_requests, get_all_requests, get_user_bookings, get_all_bookings
+from .models import Request, Booking, Invoice, Transfer
+from .helpers import get_user_requests, get_all_requests, get_user_bookings, get_all_bookings, get_all_transfers, adjust_student_balance, check_for_refund
 from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm, LogInForm, RequestForm, BookingForm
+from .forms import SignUpForm, LogInForm, RequestForm, BookingForm, TransferForm
 from django.contrib.auth import login, logout
 from .decorators import student_required, director_required, admin_required
 from django.contrib import messages
@@ -12,6 +12,9 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views import View
 from django.views.generic.edit import FormView
 from django.urls import reverse
+from django.utils import timezone
+from django.core.exceptions import PermissionDenied
+from decimal import Decimal
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
@@ -175,32 +178,37 @@ def pending_requests(request):
 @login_required
 @admin_required
 def new_booking(request, id):
-    if Request.objects.filter(id=id).exists():
+    try:
         pending_request = Request.objects.get(id=id)
-        if request.method == 'POST':
-            form = BookingForm(instance = pending_request, data = request.POST)
-            if form.is_valid():
-                Booking.objects.create(
-                    student=pending_request.student,
-                    day=form.cleaned_data.get('day'),
-                    time=form.cleaned_data.get('time'),
-                    start_date=form.cleaned_data.get('start_date'),
-                    duration=form.cleaned_data.get('duration'),
-                    interval=form.cleaned_data.get('interval'),
-                    teacher=form.cleaned_data.get('teacher'),
-                    no_of_lessons=form.cleaned_data.get('no_of_lessons'),
-                    topic=form.cleaned_data.get('topic'),
-                )
-                Request.objects.filter(id=id).delete()
-                return redirect('bookings')
-            else:
-                return render(request, 'new_booking.html', {'form': form, 'request': pending_request})
-        else:
-            form = BookingForm(instance = pending_request)
-            return render(request, 'new_booking.html', {'form': form, 'request' : pending_request})
-    else:
+    except:
         messages.add_message(request, messages.ERROR, "Request could not be found!")
         return redirect('feed')
+    if request.method == 'POST':
+        form = BookingForm(instance = pending_request, data = request.POST)
+        if form.is_valid():
+            Booking.objects.create(
+                student=pending_request.student,
+                day=form.cleaned_data.get('day'),
+                time=form.cleaned_data.get('time'),
+                start_date=form.cleaned_data.get('start_date'),
+                duration=form.cleaned_data.get('duration'),
+                interval=form.cleaned_data.get('interval'),
+                teacher=form.cleaned_data.get('teacher'),
+                no_of_lessons=form.cleaned_data.get('no_of_lessons'),
+                topic=form.cleaned_data.get('topic'),
+                cost=form.cleaned_data.get('cost'),
+            )
+            booking_request = Booking.objects.all().latest('id')
+            booking_request.generate_invoice()
+            adjust_student_balance(pending_request.student,0)
+            Request.objects.filter(id=id).delete()
+            messages.add_message(request, messages.SUCCESS, "Booking successfully created!")
+            return redirect('feed')
+        else:
+            return render(request, 'new_booking.html', {'form': form, 'request': pending_request})
+    else:
+        form = BookingForm(instance = pending_request)
+        return render(request, 'new_booking.html', {'form': form, 'request' : pending_request})
 
 @login_required
 def bookings(request):
@@ -225,6 +233,7 @@ def update_booking(request, id):
         if (form.is_valid()):
             messages.add_message(request, messages.SUCCESS, "Booking successfully updated!")
             form.save()
+            booking_request.edit_invoice()
             return redirect('bookings')
         else:
             return render(request, 'update_booking.html', {'form': form, 'request' : booking_request})
@@ -235,14 +244,58 @@ def update_booking(request, id):
 @login_required
 @admin_required
 def delete_booking(request, id):
-    if (Booking.objects.filter(pk=id)):
-        Booking.objects.filter(pk=id).delete()
-        messages.add_message(request, messages.SUCCESS, "Booking deleted!")
-        return redirect('bookings')
-    else:
+    try:
+        booking = Booking.objects.get(pk=id)
+    except:
         messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")    
         return redirect('bookings')
+   
+    check_for_refund(booking)
+    booking.delete()
+    messages.add_message(request, messages.SUCCESS, "Booking deleted!")
+    return redirect('bookings')
+
+        
         
 def log_out(request):
     logout(request)
     return redirect('home_page')
+
+@login_required
+def view_invoice(request, booking_id):
+        try:
+            booking_request = Booking.objects.get(pk=booking_id)
+            invoice = Invoice.objects.get(booking=booking_request)
+        except:
+            messages.add_message(request, messages.ERROR, "Invoice could not be found!")
+            return redirect('bookings')
+
+        if(invoice.booking.student != request.user):
+            if (request.user.is_student):
+                messages.add_message(request, messages.ERROR, "Sorry, this is not your invoice!")
+                return redirect('bookings')
+
+        return render(request, 'view_invoice.html', {'invoice' : invoice})
+
+@login_required
+@admin_required
+def transfers(request):
+    transfers = get_all_transfers()
+    if request.method == 'POST':
+        form = TransferForm(request.POST)
+        if form.is_valid():
+            Transfer.objects.create(
+                student = form.cleaned_data.get('student'),
+                amount = Decimal(form.cleaned_data.get('amount')),
+                date = timezone.now()
+            )
+            adjust_student_balance(form.cleaned_data.get('student'),form.cleaned_data.get('amount'))
+            messages.add_message(request, messages.SUCCESS, "Transfer Added!")
+            form = TransferForm()
+            return render(request, 'transfers.html', {'transfers' : transfers, 'form' : form})
+        else:
+            return render(request, 'transfers.html', {'transfers' : transfers, 'form' : form})
+    else:
+        form = TransferForm()
+        return render(request, 'transfers.html', {'transfers' : transfers, 'form' : form})
+

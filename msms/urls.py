@@ -32,4 +32,6 @@ urlpatterns = [
     path('log_in/', views.LogInView.as_view(), name='log_in'),
     path('log_out/', views.log_out, name='log_out'),
     path('bookings/', views.bookings, name='bookings'),
+    path('view_invoice/<int:booking_id>', views.view_invoice, name='view_invoice'),
+    path('transfers/', views.transfers, name='transfers'),
 ]

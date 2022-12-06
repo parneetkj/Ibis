@@ -3,7 +3,7 @@ from django import forms
 from django.test import TestCase
 from ...forms import RequestForm
 from ...models import Request, User
-import datetime
+from django.utils import timezone
 
 class SignUpFormTestCase(TestCase):
     """Unit tests of the sign up form."""
@@ -65,3 +65,20 @@ class SignUpFormTestCase(TestCase):
         self.form_input['date'] = "2022-11-16"
         form = RequestForm(data=self.form_input)
         self.assertFalse(form.is_valid())
+    
+    def test_date_should_not_be_none(self):
+        self.form_input['date'] = ""
+        form = RequestForm(data=self.form_input)
+        self.assertFalse(form.is_valid())
+    
+    def test_time_should_not_be_none(self):
+        self.form_input['time'] = ""
+        form = RequestForm(data=self.form_input)
+        self.assertFalse(form.is_valid())
+    
+    def test_time_should_not_be_in_the_past(self):
+        self.form_input['date'] = timezone.now().date()
+        self.form_input['time'] = (timezone.now() - timezone.timedelta(minutes=1)).time()
+        form = RequestForm(data=self.form_input)
+        self.assertFalse(form.is_valid())
+        

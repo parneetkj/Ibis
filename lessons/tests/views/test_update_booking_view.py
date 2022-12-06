@@ -27,7 +27,9 @@ class UpdateBookingViewTestCase(TestCase):
             'interval':1,
             'teacher':'Mrs.Smith',
             'no_of_lessons':4,
-            'topic':'Update__Test'
+            'topic':'Update__Test',
+            'cost': 14.50
+
         }
         create_bookings(self.user, 1, 3)
         self.bookings = Booking.objects.filter(student = self.user)
