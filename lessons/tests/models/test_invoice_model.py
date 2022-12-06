@@ -42,28 +42,36 @@ class InvoiceTest(TestCase):
     def test_invoice_update_correctly_when_total_is_transferred(self):
         self.booking.generate_invoice()
         self.client.login(username=self.admin.username, password='Password123')
-
-        self.assertEqual(self.user.balance, -40)
+        invoice = Invoice.objects.get(booking=self.booking)
+        self.assertEqual(5*2*4,invoice.total_price)
+        
+        self.assertEqual(self.user.balance, 0)
         self.client.post(reverse('transfers'), self.form_input, follow=True)
         self.user = User.objects.get(username='johndoe@example.org')
-        self.assertEqual(self.user.balance, 0)
+        self.assertEqual(self.user.balance, 40)
 
+        self.client.logout()
+        self.client.login(username=self.user.username, password='Password123')
+        self.client.get(reverse('pay_invoice', kwargs={'booking_id': self.booking.id }))
         invoice = Invoice.objects.get(booking=self.booking)
         self.assertEqual(invoice.booking, self.booking)
-        self.assertIsNotNone(invoice.date_paid)
         self.assertTrue(invoice.is_paid)
-        self.assertEqual(5*2*4,invoice.total_price)
+        self.assertIsNotNone(invoice.date_paid)
+        
 
     def test_invoice_update_correctly_when_less_than_total_is_transferred(self):
         self.booking.generate_invoice()
         self.client.login(username=self.admin.username, password='Password123')
         self.form_input['amount'] = '30'
 
-        self.assertEqual(self.user.balance, -40)
+        self.assertEqual(self.user.balance, 0)
         self.client.post(reverse('transfers'), self.form_input, follow=True)
         self.user = User.objects.get(username='johndoe@example.org')
-        self.assertEqual(self.user.balance, -10)
+        self.assertEqual(self.user.balance, 30)
 
+        self.client.logout()
+        self.client.login(username=self.user.username, password='Password123')
+        self.client.get(reverse('pay_invoice', kwargs={'booking_id': self.booking.id }))
         invoice = Invoice.objects.get(booking=self.booking)
         self.assertEqual(invoice.booking, self.booking)
         self.assertIsNone(invoice.date_paid)
@@ -75,13 +83,18 @@ class InvoiceTest(TestCase):
         self.client.login(username=self.admin.username, password='Password123')
         self.form_input['amount'] = '50' 
 
-        self.assertEqual(self.user.balance, -40)
+        self.assertEqual(self.user.balance, 0)
         self.client.post(reverse('transfers'), self.form_input, follow=True)
         self.user = User.objects.get(username='johndoe@example.org')
-        self.assertEqual(self.user.balance,10)
+        self.assertEqual(self.user.balance,50)
 
+        self.client.logout()
+        self.client.login(username=self.user.username, password='Password123')
+        self.client.get(reverse('pay_invoice', kwargs={'booking_id': self.booking.id }))
         invoice = Invoice.objects.get(booking=self.booking)
         self.assertEqual(invoice.booking, self.booking)
         self.assertIsNotNone(invoice.date_paid)
         self.assertTrue(invoice.is_paid)
         self.assertEqual(5*2*4,invoice.total_price)
+        self.user = User.objects.get(username='johndoe@example.org')
+        self.assertEqual(self.user.balance,10)
