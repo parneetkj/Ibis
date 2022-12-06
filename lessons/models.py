@@ -94,14 +94,29 @@ class Term(models.Model):
 
     start_date = models.DateField(blank=False)
     end_date = models.DateField(blank=False)
+        
+def get_default_term():
+    terms = Term.objects.all().order_by('start_date')
+    default_term = None
+    count = 0
+    while not default_term: 
+        term = terms[count]
 
+        if (term.end_date > timezone.now().date()) and (term.start_date < timezone.now().date()) :
+            default_term = term
+        elif (term.start_date > timezone.now().date()):
+            default_term = term
+
+        count += 1
+
+    return default_term
 
 class Booking(models.Model):
     """ Booking by admin """
 
     student = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    term = models.ForeignKey(Term, on_delete=models.CASCADE)
+    term = models.ForeignKey(Term, on_delete=models.CASCADE, default=get_default_term)
     
     start_date = models.DateField(blank=False)
 

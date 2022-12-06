@@ -32,6 +32,7 @@ class BookingForm(forms.ModelForm):
         model = Booking    
         exclude = ['student', 'no_of_lessons']
 
+
     def clean(self):
         super().clean()
         term = self.cleaned_data.get('term')
@@ -55,6 +56,7 @@ class BookingForm(forms.ModelForm):
             self.add_error('end_date','Date must be after term start date')
         if(term.start_date > start_date):
             self.add_error('start_date','Date must be after term start date')
+            
 
 
 class LogInForm(forms.Form):
