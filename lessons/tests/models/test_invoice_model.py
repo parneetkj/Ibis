@@ -79,7 +79,6 @@ class InvoiceTest(TestCase):
         self.assertEqual(5*2*4,invoice.total_price)
 
     def test_invoice_update_correctly_when_more_than_total_is_transferred(self):
-        print("\nThis test\n")
         self.booking.generate_invoice()
         self.client.login(username=self.admin.username, password='Password123')
         self.form_input['amount'] = '50' 

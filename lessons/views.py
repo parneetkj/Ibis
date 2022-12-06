@@ -302,15 +302,15 @@ def transfers(request):
 @login_required
 @student_required
 def pay_invoice(request, booking_id):
+    try:
+        booking = Booking.objects.get(id=booking_id)
+        student = booking.student
+        invoice = Invoice.objects.get(booking=booking)
+    except:
+        messages.add_message(request, messages.ERROR, "Sorry, could not locate the invoice!")
+        return redirect('bookings')
+        
     if request.method == 'GET':
-        try:
-            booking = Booking.objects.get(id=booking_id)
-            student = booking.student
-            invoice = Invoice.objects.get(booking=booking)
-        except:
-            messages.add_message(request, messages.ERROR, "Sorry, could not locate the invoice!")
-            return render(request, 'view_invoice.html', {'invoice' : invoice})
-
         if(student.balance >= invoice.total_price):
             student.decrease_balance(invoice.total_price)
             invoice.is_paid = True
