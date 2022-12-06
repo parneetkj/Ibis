@@ -14,6 +14,8 @@ class RequestForm(forms.ModelForm):
     def clean(self):
         super().clean()
         date = self.cleaned_data.get('date')
+        
+
         if (date == None):
             return
         if(date <= timezone.now().date()):
@@ -33,10 +35,26 @@ class BookingForm(forms.ModelForm):
     def clean(self):
         super().clean()
         term = self.cleaned_data.get('term')
-        if (term == None):
+        start_date=self.cleaned_data.get('start_date')
+        end_date=self.cleaned_data.get('end_date')
+
+        if (term == None) or (end_date == None) or (start_date == None):
             return
+
         if(term.end_date <= timezone.now().date()):
             self.add_error('term','Term must be in the future.')
+
+        if (end_date <= start_date):
+            self.add_error('end_date','End date must be after start date')
+
+        if(term.end_date < end_date):
+            self.add_error('end_date','Date must be before term end date')
+        if(term.end_date < start_date):
+            self.add_error('start_date','Date must be before term end date')
+        if(term.start_date > end_date):
+            self.add_error('end_date','Date must be after term start date')
+        if(term.start_date > start_date):
+            self.add_error('start_date','Date must be after term start date')
 
 
 class LogInForm(forms.Form):

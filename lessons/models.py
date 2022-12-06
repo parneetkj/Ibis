@@ -158,6 +158,7 @@ class Booking(models.Model):
 
     no_of_lessons = models.IntegerField(default=0)
 
+    
 
     def generate_invoice():
         pass
