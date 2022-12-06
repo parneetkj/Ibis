@@ -30,6 +30,15 @@ class BookingForm(forms.ModelForm):
         model = Booking    
         exclude = ['student', 'no_of_lessons']
 
+    def clean(self):
+        super().clean()
+        term = self.cleaned_data.get('term')
+        if (term == None):
+            return
+        if(term.end_date <= timezone.now().date()):
+            self.add_error('term','Term must be in the future.')
+
+
 class LogInForm(forms.Form):
     """Form enabling registered users to log in."""
 
