@@ -341,6 +341,7 @@ def pay_invoice(request, invoice_id):
             invoice = Invoice.objects.get(id=invoice_id)
             form = TransferForm()
             transfers = get_invoice_transfers(invoice)
+            messages.add_message(request, messages.SUCCESS, "Transfer added!")
             return render(request, 'view_invoice.html', {'invoice' : invoice, 'transfers':transfers, 'form':form})
     else:
         form = TransferForm()

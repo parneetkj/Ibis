@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from lessons.models import Invoice, User, Booking
 from lessons.tests.helpers import reverse_with_next
+from lessons.helpers import calculate_student_balance
 
 class PayInvoiceViewTestCase(TestCase):
     """Test case of new request view"""
@@ -31,19 +32,19 @@ class PayInvoiceViewTestCase(TestCase):
         )
         self.booking.save()
         self.booking.generate_invoice()
+        calculate_student_balance(self.user)
         self.invoice = Invoice.objects.get(booking = self.booking)
-        self.url = reverse('pay_invoice', kwargs={'booking_id': self.booking.pk})
+        self.url = reverse('pay_invoice', kwargs={'invoice_id': self.invoice.pk})
+        self.form_input = {'amount': '40'}
 
     def test_pay_invoice_url(self):
         self.assertEqual(self.url,f'/pay_invoice/{self.booking.pk}')
     
     def test_get_pay_invoice(self):
-        self.client.login(username=self.user.username, password='Password123')
+        self.client.login(username=self.admin.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'view_invoice.html')
-        messages_list = list(response.context['messages'])
-        self.assertEqual(len(messages_list), 1)
     
     def test_get_pay_invoice_redirects_when_not_logged_in(self):
         response = self.client.get(self.url, follow=True)
@@ -51,8 +52,8 @@ class PayInvoiceViewTestCase(TestCase):
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'log_in.html')
 
-    def test_get_pay_invoice_redirects_for_admins(self):
-        self.client.login(username=self.admin.username, password='Password123')
+    def test_get_pay_invoice_redirects_for_students(self):
+        self.client.login(username=self.user.username, password='Password123')
         redirect_url = reverse('feed')
         response = self.client.get(self.url, follow=True)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
@@ -61,11 +62,10 @@ class PayInvoiceViewTestCase(TestCase):
         self.assertEqual(len(messages_list), 1)
     
     def test_get_pay_invoice_sets_invoice_correctly_with_full_amount(self):
-        self.user.balance = 40
-        self.user.save()
-        self.client.login(username=self.user.username, password='Password123')
+        self.client.login(username=self.admin.username, password='Password123')
+        self.assertEqual(self.user.balance, -40)
 
-        response = self.client.get(self.url, follow=True)
+        response = self.client.post(self.url, self.form_input, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'view_invoice.html')
         messages_list = list(response.context['messages'])
@@ -79,11 +79,11 @@ class PayInvoiceViewTestCase(TestCase):
         self.assertIsNotNone(self.invoice.date_paid)
     
     def test_get_pay_invoice_sets_invoice_correctly_with_under_amount(self):
-        self.user.balance = 30
-        self.user.save()
+        self.client.login(username=self.admin.username, password='Password123')
+        self.assertEqual(self.user.balance, -40)
+        self.form_input['amount'] = '30'
 
-        self.client.login(username=self.user.username, password='Password123')
-        response = self.client.get(self.url, follow=True)
+        response = self.client.post(self.url, self.form_input, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'view_invoice.html')
         messages_list = list(response.context['messages'])
@@ -92,16 +92,16 @@ class PayInvoiceViewTestCase(TestCase):
         self.invoice = Invoice.objects.get(id=self.booking.pk)
         self.user = User.objects.get(username='johndoe@example.org')
 
-        self.assertEqual(self.user.balance, 30)
+        self.assertEqual(self.user.balance, -10)
         self.assertFalse(self.invoice.is_paid)
         self.assertIsNone(self.invoice.date_paid)
     
     def test_get_pay_invoice_sets_invoice_correctly_with_over_amount(self):
-        self.user.balance = 50
-        self.user.save()
+        self.client.login(username=self.admin.username, password='Password123')
+        self.assertEqual(self.user.balance, -40)
+        self.form_input['amount'] = '50'
 
-        self.client.login(username=self.user.username, password='Password123')
-        response = self.client.get(self.url, follow=True)
+        response = self.client.post(self.url, self.form_input, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'view_invoice.html')
         messages_list = list(response.context['messages'])
@@ -114,21 +114,21 @@ class PayInvoiceViewTestCase(TestCase):
         self.assertTrue(self.invoice.is_paid)
         self.assertIsNotNone(self.invoice.date_paid)
     
-    def test_post_pay_invoice_is_rejected(self):
-        self.client.login(username=self.user.username, password='Password123')
-        response = self.client.post(self.url, follow=True)
+    def test_get_pay_invoice_loads_view_invoice(self):
+        self.client.login(username=self.admin.username, password='Password123')
+        response = self.client.get(self.url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'view_invoice.html')
     
     def test_get_pay_invoice_redirects_if_invoice_not_found(self):
         self.client.login(username=self.user.username, password='Password123')
-        self.url = reverse('pay_invoice', kwargs={'booking_id': Booking.objects.count() +1})
+        self.url = reverse('pay_invoice', kwargs={'invoice_id': Invoice.objects.count() +1})
         response = self.client.get(self.url, follow=True)
-        redirect_url = reverse('bookings')
+        redirect_url = reverse('feed')
         response = self.client.get(self.url, follow=True)
         self.assertRedirects(response, redirect_url,
             status_code=302, target_status_code=200, fetch_redirect_response=True
         )
-        self.assertTemplateUsed(response, 'bookings.html')
+        self.assertTemplateUsed(response, 'feed.html')
         messages_list = list(response.context['messages'])
-        self.assertEqual(len(messages_list), 2)
+        self.assertEqual(len(messages_list), 1)
