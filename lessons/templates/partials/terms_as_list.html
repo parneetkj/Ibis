@@ -1,0 +1,14 @@
+<ul class="list-group list-group-flush">
+  {% for term in terms %}
+  <li class="list-group-item">
+    <h5 class="mb-1">
+      Term {{ term.id }}
+      <a href="#" class="btn btn-danger float-end" style="margin:5px;" >Delete</a>
+      <a href="#" class="btn btn-primary float-end" style="margin:5px;" >Edit</a>
+    </h5>
+    <p class="lead mb-1">
+      From <b>{{term.start_date}}</b> to <b>{{term.end_date}}</b>
+    </p>
+  </li>
+  {% endfor %}
+</ul>

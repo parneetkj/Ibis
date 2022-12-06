@@ -1,19 +1,26 @@
 {% extends 'base_content.html' %}
 {% block content %}
 <div class="container">
-  <div class="row">
+  <div class="row mb-3 ">
     <h1>Terms</h1>
     <div>
-      {% for term in terms %}
-        <p>Start Date : {{term.start_date}}   End Date : {{term.end_date}} </p>
-      {% endfor %}
+      {% include 'partials/terms_as_list.html' with terms=terms %}
     </div>
-    <form method="post">
-      {% csrf_token %}
-      {% include 'partials/bootstrap_form.html' with form=form %}
-      <a href="{%url 'feed'%}" type="button" class="btn btn-secondary">Back</a>
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+  </div>
+  <div class="row mb-3 col-6 mx-auto">
+    <button class="btn btn-outline-primary btn-lg" type="button" data-bs-toggle="collapse" data-bs-target="#showForm" aria-expanded="false" aria-controls="showForm">
+      Add new term
+    </button>
+  </div>
+  <div class="row mb-3 ">
+    <div class="collapse multi-collapse" id="showForm">
+      <form action="{% url 'new_term' %}" method="post">
+        {% csrf_token %}
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        <a href="{%url 'feed' %}" type="button" class="btn btn-secondary">Back</a>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div> 
   </div>
 </div>
 {% endblock %}
