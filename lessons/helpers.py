@@ -26,13 +26,28 @@ def get_all_bookings():
 def get_all_transfers():
     return Transfer.objects.all()
 
+def get_all_invoices():
+    return Invoice.objects.all()
+    
 def check_for_refund(booking):
     invoice = Invoice.objects.get(booking=booking)
     if invoice.is_paid:
         booking.student.increase_balance(invoice.total_price)
+
+def get_user_transfers(user):
+    return Transfer.objects.filter(student=user)
+
+def create_transfer(invoice,amount):
+    Transfer.objects.create(invoice=invoice,amount=amount)
+    invoice.add_partial_payment(amount)
+
 class LogInTester:
     def _is_logged_in(self):
         return '_auth_user_id' in self.client.session.keys()
+
+
+    
+
 
 def login_prohibited(view_function):
     def modified_view_function(request):

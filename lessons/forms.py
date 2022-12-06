@@ -102,9 +102,10 @@ class SignUpForm(forms.ModelForm):
         return user
 
 class TransferForm(forms.Form):
-    student = forms.ModelChoiceField(queryset=User.objects.filter(is_student=True))
     amount = forms.DecimalField(
         label='Amount Paid:',
         min_value=0,
         step_size=0.01
         )
+class SelectStudentForm(forms.Form):
+    student = forms.ModelChoiceField(queryset=User.objects.filter(is_student=True))

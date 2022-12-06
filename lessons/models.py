@@ -186,11 +186,20 @@ class Booking(models.Model):
 class Invoice(models.Model):
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE, blank=False)
     total_price = models.DecimalField(blank=False, max_digits=10, decimal_places=2)
+    partial_payment = models.DecimalField(default=0 ,max_digits=10, decimal_places=2)
     is_paid = models.BooleanField(default=False)
     date_paid = models.DateTimeField(auto_now_add=False, blank=True, null=True)
 
+    def add_partial_payment(self,amount):
+        self.partial_payment += amount
+        self.save()
+    def check_if_paid(self):
+        if self.partial_payment >= self.total_price:
+            self.is_paid = True
+            self.date_paid = timezone.now()
+            self.save()
 class Transfer(models.Model):
-    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     amount = models.DecimalField(blank=False, max_digits=10, decimal_places=2)
     date = models.DateTimeField(auto_now_add=True, blank=False)
 

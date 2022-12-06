@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
 from .models import Request, Booking, Invoice, Transfer, User
-from .helpers import get_user_requests, get_all_requests, get_user_bookings, get_all_bookings, get_all_transfers, check_for_refund
+from .helpers import get_user_requests, get_all_requests, get_user_bookings, get_all_bookings, get_all_transfers, check_for_refund, get_user_transfers, get_all_invoices, create_transfer
 from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm, LogInForm, RequestForm, BookingForm, TransferForm
+from .forms import SignUpForm, LogInForm, RequestForm, BookingForm, TransferForm, SelectStudentForm
 from django.contrib.auth import login, logout
 from .decorators import student_required, director_required, admin_required
 from django.contrib import messages
@@ -266,6 +266,7 @@ def view_invoice(request, booking_id):
         try:
             booking_request = Booking.objects.get(pk=booking_id)
             invoice = Invoice.objects.get(booking=booking_request)
+            transfers = Transfer.objects.filter(invoice=invoice)
         except:
             messages.add_message(request, messages.ERROR, "Invoice could not be found!")
             return redirect('bookings')
@@ -274,53 +275,70 @@ def view_invoice(request, booking_id):
             if (request.user.is_student):
                 messages.add_message(request, messages.ERROR, "Sorry, this is not your invoice!")
                 return redirect('bookings')
+        if (request.user.is_admin):
+            if(invoice.is_paid == False):
+                form = TransferForm()
+                return render(request, 'view_invoice.html', {'invoice' : invoice, 'transfers':transfers, 'form':form})
+            else:
+                return render(request, 'view_invoice.html', {'invoice' : invoice, 'transfers':transfers})
+        else:
+             return render(request, 'view_invoice.html', {'invoice' : invoice, 'transfers':transfers})
+@login_required
+def transfers(request):
+    if (request.user.is_student):
+        return redirect('feed')
+    if request.method == 'POST':
+        form = SelectStudentForm(request.POST)
+        if form.is_valid():
+            try:
+                student = User.objects.get(id=form.cleaned_data.get('student').pk)
+            except:
+                form = SelectStudentForm()
+                messages.add_message(request, messages.ERROR, "Sorry, could not find this student!")
+                return render(request, 'transfers.html', {'form' : form})
 
-        return render(request, 'view_invoice.html', {'invoice' : invoice})
+            return student_transfers(request,student.pk)
+    if request.method == 'GET':
+        form = SelectStudentForm()
+        return render(request, 'transfers.html', {'form' : form})
+
+    else:
+        return render(request, 'transfers.html', {'form' : form})
+
+@login_required
+def student_transfers(request, student_id=None):
+    try:
+        if(student_id==None):
+            student = User.objects.get(id=request.user.pk)
+        else:
+            student = User.objects.get(id=student_id)
+        user_bookings = get_user_bookings(student)
+        user_invoices = Invoice.objects.filter(booking__in=user_bookings)
+        user_transfers = Transfer.objects.filter(invoice__in=user_invoices)
+    except:
+        messages.add_message(request, messages.ERROR, "Sorry, could not find your data.")
+        return redirect('bookings')
+
+    return render(request, 'student_transfers.html', {'transfers' : user_transfers,'invoices':user_invoices})
+
 
 @login_required
 @admin_required
-def transfers(request):
-    transfers = get_all_transfers()
-    if request.method == 'POST':
-        form = TransferForm(request.POST)
-        if form.is_valid():
-            Transfer.objects.create(
-                student = form.cleaned_data.get('student'),
-                amount = Decimal(form.cleaned_data.get('amount')),
-                date = timezone.now()
-            )
-            messages.add_message(request, messages.SUCCESS, "Transfer Added!")
-            form.cleaned_data.get('student').increase_balance(Decimal(form.cleaned_data.get('amount')))
-            form = TransferForm()
-            return render(request, 'transfers.html', {'transfers' : transfers, 'form' : form})
-        else:
-            return render(request, 'transfers.html', {'transfers' : transfers, 'form' : form})
-    else:
-        form = TransferForm()
-        return render(request, 'transfers.html', {'transfers' : transfers, 'form' : form})
-
-@login_required
-@student_required
-def pay_invoice(request, booking_id):
+def pay_invoice(request, invoice_id):
     try:
-        booking = Booking.objects.get(id=booking_id)
-        student = booking.student
-        invoice = Invoice.objects.get(booking=booking)
+        invoice = Invoice.objects.get(id=invoice_id)
     except:
         messages.add_message(request, messages.ERROR, "Sorry, could not locate the invoice!")
         return redirect('bookings')
         
-    if request.method == 'GET':
-        if(student.balance >= invoice.total_price):
-            student.decrease_balance(invoice.total_price)
-            invoice.is_paid = True
-            invoice.date_paid = timezone.now()
-            invoice.save()
-            messages.add_message(request, messages.SUCCESS, "Invoice was paid!")
-            invoice = Invoice.objects.get(booking=booking)
-            return render(request, 'view_invoice.html', {'invoice' : invoice})
-        else:
-            messages.add_message(request, messages.WARNING, "Sorry, your balance is too low to pay this invoice")
-            return render(request, 'view_invoice.html', {'invoice' : invoice})
+    if request.method == 'POST':
+        form = TransferForm(request.POST)
+        if form.is_valid():
+            create_transfer(invoice, form.cleaned_data.get('amount'))
+            invoice.check_if_paid()
+            invoice = Invoice.objects.get(id=invoice_id)
+            form = TransferForm()
+            return render(request, 'view_invoice.html', {'invoice' : invoice, 'form':form})
     else:
-        return render(request, 'view_invoice.html', {'invoice' : invoice})
+        form = TransferForm()
+        return render(request, 'view_invoice.html', {'invoice' : invoice, 'form':form})

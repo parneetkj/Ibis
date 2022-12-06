@@ -1,11 +1,11 @@
 {% for transfer in transfers %}
 <div class="accordion-item">
-    <h2 class="accordion-header" id="header_{{transfer.pk}}">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{transfer.pk}}" aria-expanded="false" aria-controls="collapse_{{transfer.pk}}">
-        Transfer ID: {{transfer.student.pk}} - {{transfer.pk}} : Student: {{transfer.student.full_name}}
+    <h2 class="accordion-header" id="transfer_{{transfer.pk}}">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#transfer_collapse_{{transfer.pk}}" aria-expanded="false" aria-controls="transfer_collapse_{{transfer.pk}}">
+        Transfer ID: {{transfer.invoice.booking.student.pk}} - {{transfer.pk}} : Student: {{transfer.invoice.booking.student.full_name}}
       </button>
     </h2>
-    <div id="collapse_{{transfer.pk}}" class="accordion-collapse collapse" aria-labelledby="header_{{transfer.pk}}" data-bs-parent="#TransfersACC">
+    <div id="transfer_collapse_{{transfer.pk}}" class="accordion-collapse collapse" aria-labelledby="transfer_{{transfer.pk}}" data-bs-parent="#TransfersACC">
         <div class="accordion-body">
             <p><strong>Transfer of: </strong> £{{transfer.amount}}</p>
             <p><strong>Date & Time: </strong> {{transfer.date}}</p>

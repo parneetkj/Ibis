@@ -1,0 +1,21 @@
+{% for invoice in invoices %}
+<div class="accordion-item">
+    <h2 class="accordion-header" id="invoice_{{invoice.pk}}">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#invoice_collapse_{{invoice.pk}}" aria-expanded="false" aria-controls="invoice_collapse_{{invoice.pk}}">
+        Invoice ID: {{invoice.booking.student.id}} - {{invoice.booking.id}} <br> 
+        Student: {{invoice.booking.student.full_name}} <br>
+      </button>
+    </h2>
+    <div id="invoice_collapse_{{invoice.pk}}" class="accordion-collapse collapse" aria-labelledby="invoice{{invoice.pk}}" data-bs-parent="#InvoicesACC">
+        <div class="accordion-body">
+            <p><strong>Booking ID: </strong> {{invoice.booking.id}}</p>
+            <p><strong>StartDate & Time: </strong> {{invoice.booking.start_date}} - {{invoice.booking.time}}</p>
+            <p><strong>Total Due: </strong> £{{invoice.total_price}}</p>
+            <p><strong>Partial Payments: </strong> £{{invoice.partial_payment}}</p>
+            <a href="{%url 'view_invoice' invoice.booking.id %}" type="button" class="btn btn-primary">View Full Invoice</a>
+        </div>
+    </div>
+  </div>
+
+
+{% endfor %}

@@ -5,7 +5,7 @@
 </div>
 
 <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
-    <div class="col-lg-4 d-flex align-items-stretch">
+    <div class="col-lg-3 d-flex align-items-stretch">
         <div class="card mb-4 rounded-3 shadow-sm">
             <h4 class="card-header py-3">New Request</h4>
             <div class="card-body">
@@ -16,7 +16,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-4 d-flex align-items-stretch">
+    <div class="col-lg-3 d-flex align-items-stretch">
         <div class="card mb-4 rounded-3 shadow-sm">
             <h4 class="card-header py-3">Pending Requests</h4>
             <div class="card-body">
@@ -27,7 +27,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-4 d-flex align-items-stretch">
+    <div class="col-lg-3 d-flex align-items-stretch">
         <div class="card mb-4 rounded-3 shadow-sm">
             <h4 class="card-header py-3">Bookings</h4>
             <div class="card-body">
@@ -35,6 +35,17 @@
             </div>
             <div class="card-header">
                 <a href="{%url 'bookings'%}" type="button" class="w-100 btn btn-lg btn-outline-primary">See your bookings</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 d-flex align-items-stretch">
+        <div class="card mb-4 rounded-3 shadow-sm">
+            <h4 class="card-header py-3">Invoices</h4>
+            <div class="card-body">
+                <p class="lead">View all invoices & transfers for your account.</p>
+            </div>
+            <div class="card-header">
+                <a href="{%url 'student_transfers'%}" type="button" class="w-100 btn btn-lg btn-outline-primary">See your invoices</a>
             </div>
         </div>
     </div>
