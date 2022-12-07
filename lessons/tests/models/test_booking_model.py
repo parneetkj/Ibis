@@ -1,26 +1,33 @@
 """Unit tests of the Booking model."""
 from django.test import TestCase
-from ...models import Booking, User
+from ...models import Booking, User, Term
 from django.core.exceptions import ValidationError
 
 class BookingTest(TestCase):
     """Unit tests of the Booking model."""
 
-    fixtures = ['lessons/tests/fixtures/default_user.json']
+    fixtures = [
+        'lessons/tests/fixtures/default_user.json',
+        'lessons/tests/fixtures/default_terms.json'
+    ]
 
     def setUp(self):
         self.user = User.objects.get(username='johndoe@example.org')
+        self.term = Term.objects.get(pk=2)
+        self.start_date = self.term.start_date
+        self.end_date = self.term.end_date
 
         self.booking = Booking(
             student=self.user,
+            term=self.term,
+            start_date=self.start_date,
+            end_date=self.end_date,
             day="Monday",
             time="14:30",
-            start_date="2022-11-16",
             duration=30,
             interval=1,
             teacher="Mrs.Smith",
-            no_of_lessons=4,
-            topic="Violin"
+            topic="Violin",
         )
 
     def test_valid_booking(self):
@@ -39,6 +46,10 @@ class BookingTest(TestCase):
         self._assert_booking_is_invalid()
 
     def test_start_date_should_not_be_blank(self):
+        self.booking.start_date = ""
+        self._assert_booking_is_invalid()
+    
+    def test_end_date_should_not_be_blank(self):
         self.booking.start_date = ""
         self._assert_booking_is_invalid()
 
@@ -76,10 +87,6 @@ class BookingTest(TestCase):
 
     def test_teacher_should_not_be_too_long(self):
         self.booking.teacher = "X" * 101
-        self._assert_booking_is_invalid()
-
-    def test_no_of_lessons_should_not_be_less_than_1(self):
-        self.booking.no_of_lessons = 0
         self._assert_booking_is_invalid()
 
     def test_topic_may_not_be_blank(self):

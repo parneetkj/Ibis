@@ -1,0 +1,51 @@
+
+[
+  {
+    "model": "lessons.term",
+    "pk": 1,
+    "fields": {
+      "start_date": "2022-09-01",
+      "end_date": "2022-10-21"
+    }
+  },
+  {
+    "model": "lessons.term",
+    "pk": 2,
+    "fields": {
+      "start_date": "2022-10-31",
+      "end_date": "2022-12-16"
+    }
+  },
+  {
+    "model": "lessons.term",
+    "pk": 3,
+    "fields": {
+      "start_date": "2023-01-03",
+      "end_date": "2023-02-10"
+    }
+  },
+  {
+    "model": "lessons.term",
+    "pk": 4,
+    "fields": {
+      "start_date": "2023-02-20",
+      "end_date": "2023-03-31"
+    }
+  },
+  {
+    "model": "lessons.term",
+    "pk": 5,
+    "fields": {
+      "start_date": "2023-04-17",
+      "end_date": "2023-05-26"
+    }
+  },
+  {
+    "model": "lessons.term",
+    "pk": 6,
+    "fields": {
+      "start_date": "2023-06-05",
+      "end_date": "2023-07-21"
+    }
+  }
+]

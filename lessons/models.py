@@ -171,7 +171,18 @@ class Booking(models.Model):
         blank=False
     )
 
-    no_of_lessons = models.IntegerField(default=0)
+    no_of_lessons = models.IntegerField(default=0,
+        # validators=[
+        #         MinValueValidator(
+        #             limit_value=1,
+        #             #message="Must book at least 1 lesson."
+        #         ),
+        #         MaxValueValidator(
+        #             limit_value=50,
+        #             #message="Cannot book more than 50 lessons."
+        #         )
+        #     ]
+    )
 
     
 
