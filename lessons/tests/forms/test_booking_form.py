@@ -21,6 +21,7 @@ class BookingTestCase(TestCase):
             'teacher':'Mrs.Smith',
             'no_of_lessons':4,
             'topic':'Violin',
+            'cost':14.50
         }
 
     def test_valid_request_form(self):

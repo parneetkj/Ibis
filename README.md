@@ -1,8 +1,8 @@
-# Team *<enter team name here>* Small Group project
+# Team *<Ibis>* Small Group project
 
 ## Team members
 The members of the team are:
-- *<name of team member 1>*
+- *<William Lingard>*
 - *<name of team member 2>*
 - *<name of team member 3>*
 - *<name of team member 4>*
@@ -12,7 +12,7 @@ The members of the team are:
 The project is called `msms` (Music School Management System).  It currently consists of a single app `lessons` where all functionality resides.
 
 ## Deployed version of the application
-The deployed version of the application can be found at *<[enter URL here](URL)>*.
+The deployed version of the application can be found at *<[https://lecturemonk.pythonanywhere.com/](URL)>*.
 
 ## Installation instructions
 To install the software and use it in your local development environment, you must first set up and activate a local development environment.  From the root of the project:

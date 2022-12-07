@@ -3,6 +3,7 @@
 <div class="container py-4">
   <header class="pb-3 mb-4 border-bottom">
     <h1 class="display-5 fw-bold">Music School Management System</h1>
+    <h2> Welcome {{user.full_name}}</h2>
   </header>
   {% if user.is_student %}
     {% include 'partials/feed_for_student.html' %}

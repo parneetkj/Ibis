@@ -1,0 +1,43 @@
+<table class="table">
+    <tr>
+        <td>
+            <p> Student: {{ invoice.booking.student }} </p>
+            <p> Start Date: {{ invoice.booking.start_date }} </p>
+            <p> Time: {{ invoice.booking.time }} </p>
+            <p> Number of Lessons: {{ invoice.booking.no_of_lessons }} </p>
+            <p> Interval: {{ invoice.booking.interval }} </p>
+            <p> Duration: {{ invoice.booking.duration }} </p>
+            <p> Topic: {{ invoice.booking.topic }} </p>
+            <p> Teacher: {{ invoice.booking.teacher }} </p>
+            <p> Cost per 15 Mins: £{{ invoice.booking.cost }} </p>
+            
+        </td>
+        <td style="width:40%">
+            {% if invoice.is_paid %}
+                <div class="alert alert-success" role="alert">
+                    <P>Paid!</p>
+                    {{invoice.date_paid}}
+                </div>
+            {%elif invoice.partial_payment != 0%}
+                <div class="alert alert-warning" role="alert">
+                    <P>Partial Payment</p>
+                    Paid so far: £{{invoice.partial_payment}}
+                </div>
+            {%else%}
+                <div class="alert alert-danger" role="alert">
+                    Not Paid!
+                </div>
+            {%endif%}
+            <div class="accordion" id="TransfersACC">
+                {% include 'partials/transfers_as_accordion.html' with transfers=transfers %}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        {% if invoice.is_paid %}
+            <h2>£{{invoice.total_price}}</h2>
+        {%else%}
+            <h2>Total to pay: £{{invoice.total_price}} </h2> 
+        {%endif%}
+    </tr>
+</table>
