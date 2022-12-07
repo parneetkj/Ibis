@@ -1,0 +1,24 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+    <div class="card mb-4 rounded-3">
+        <h4 class="card-body py-3">Current balanace is £ {{student.balance}} </h4>
+        </div>
+    <div class="row">
+        <div class="col-xs-12 col-lg-6 col-xl-4">
+            <h3>Invoices:</h3>
+            <div class="accordion" id="InvoicesACC">
+                {% include 'partials/invoices_as_accordion.html' with invoices=invoices %}
+            </div>
+        </div>
+        <div class="col-xs-12 col-lg-6 col-xl-8">
+            <h3>Transfers:</h3>
+            <div class="accordion" id="TransfersACC">
+                {% include 'partials/transfers_as_accordion.html' with transfers=transfers %}
+            </div>
+        </div>
+    </div>
+    <br>
+    <a href="{%url 'transfers' %}" type="button" class="btn btn-primary">Back</a>
+</div>
+{% endblock %}

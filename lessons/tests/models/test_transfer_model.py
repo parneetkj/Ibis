@@ -1,9 +1,10 @@
 from django.test import TestCase
-from ...models import Transfer, User
+from ...models import Transfer, User, Invoice, Booking
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from decimal import Decimal
 import datetime
+from lessons.helpers import calculate_student_balance
 
 class TransferTest(TestCase):
     """Unit tests of the Transfer model."""
@@ -13,21 +14,38 @@ class TransferTest(TestCase):
     ]
     def setUp(self):
         self.user = User.objects.get(username='johndoe@example.org')
-        self.transfer = Transfer(
+
+        self.booking = Booking(
             student=self.user,
+            day="Monday",
+            time="14:30",
+            start_date="2022-11-16",
+            duration=30,
+            interval=1,
+            teacher="Mrs.Smith",
+            no_of_lessons=4,
+            topic="Violin",
+            cost=5
+        )
+        self.booking.save()
+        self.booking.generate_invoice()
+        self.invoice = Invoice.objects.get(booking=self.booking)
+        self.transfer = Transfer(
+            invoice=self.invoice,
             amount= Decimal('25.55'),
             date = timezone.now()
         )
         self.transfer.save()
+        calculate_student_balance(self.user)
     
     def test_transfer_is_valid(self):
         self._assert_transfer_is_valid()
 
-    def test_user_is_required(self):
-        self.transfer.student = None
+    def test_invoice_is_required(self):
+        self.transfer.invoice = None
         self._assert_transfer_is_invalid()
     
-    def test_amount_must_be_a_float(self):
+    def test_amount_must_be_a_Decimal(self):
         self.transfer.amount = "Test"
         self._assert_transfer_is_invalid()
 

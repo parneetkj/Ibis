@@ -8,16 +8,13 @@ class TransferFormTestCase(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username='johndoe@example.org')
-        self.form_input = {'student': self.user, 'amount': 8.12}
+        self.form_input = {'amount': 8.12}
         
     def test_form_contains_required_fields(self):
         form = TransferForm()
         self.assertIn('amount', form.fields)
         amount = form.fields['amount']
         self.assertTrue(isinstance(amount, forms.DecimalField))
-        self.assertIn('student', form.fields)
-        student = form.fields['student']
-        self.assertTrue(isinstance(student, forms.ModelChoiceField))
 
     def test_form_accepts_valid_input(self):
         form = TransferForm(data=self.form_input)

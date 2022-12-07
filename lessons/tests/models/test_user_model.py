@@ -86,23 +86,18 @@ class UserModelTestCase(TestCase):
     def test_balance_starts_at_0(self):
         self.assertEqual(self.user.balance, 0.00)
 
-    def test_balance_can_increase(self):
-        new_balance = self.user.increase_balance(Decimal(8.56))
-        self.assertEqual(new_balance, self.user.balance)
+    def test_balance_can_be_positive(self):
+        self.user.set_balance(20.55)
+        self.user = User.objects.get(username='johndoe@example.org')
+        self.assertEqual(20.55, float(self.user.balance))
         self._assert_user_is_valid()
-        self.user.balance = 0.00
-
-    def test_balance_can_decrease(self):
-        new_balance = self.user.decrease_balance(Decimal(8.58))
-        self.assertEqual(new_balance, self.user.balance)
-        self._assert_user_is_valid()
-        self.user.balance = 0.00
     
     def test_balance_can_be_negative(self):
-        new_balance = self.user.decrease_balance(Decimal(100.51))
-        self.assertEqual(new_balance, self.user.balance)
+        self.user.set_balance(-20.55)
+        self.user = User.objects.get(username='johndoe@example.org')
+        self.assertEqual(-20.55, float(self.user.balance))
         self._assert_user_is_valid()
-        self.user.balance = 0.00
+
 
     def test_full_name_returns_correctly(self):
         self.assertEqual(self.user.full_name, f"{self.user.first_name} {self.user.last_name}")

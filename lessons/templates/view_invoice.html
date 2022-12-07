@@ -3,8 +3,24 @@
 <div class="container">
     <div class="row">
         <h1>Invoice: {{invoice.booking.student.id}}-{{invoice.booking.id}} </h1>
-        {% include 'partials/invoice_as_table.html' with invoice=invoice %}
+        {% include 'partials/invoice_as_table.html' with invoice=invoice transfers=transfers%}
     </div>
-    <a href="{%url 'bookings' %}" type="button" class="btn btn-primary">Back</a>
+    
+    {% if user.is_admin and not invoice.is_paid%}
+        <h3>Add a transfer:</h3>
+        <form action="{% url 'pay_invoice' invoice.id %}" method="post">
+            {% csrf_token %}
+            {% include 'partials/bootstrap_form.html' with form=form %}
+            <input type="submit" value="Add Transfer" class="btn btn-primary">
+        </form>
+    {%endif%}
+    <div>
+        <br>
+        {% if user.is_admin%}
+            <a href="{%url 'transfers' %}" type="button" class="btn btn-primary">Back</a>
+        {%else%}
+            <a href="{%url 'student_transfers' %}" type="button" class="btn btn-primary">Back</a>
+        {%endif%}
+    </div>
 </div>
 {% endblock %}
