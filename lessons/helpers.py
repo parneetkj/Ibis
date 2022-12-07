@@ -4,30 +4,20 @@ from django.shortcuts import redirect
 from django.utils import timezone
 
 def get_user_requests(user):
-    # To do: Change to user when implemented
     requests = Request.objects.filter(student=user)
     return requests
 
 def get_all_requests():
-    # To do: Change to user when implemented
     requests = Request.objects.filter()
     return requests
 
 def get_user_bookings(user):
-    # To do: Change to user when implemented
     bookings = Booking.objects.filter(student=user)
     return bookings
 
 def get_all_bookings():
-    # To do: Change to user when implemented
     bookings = Booking.objects.filter()
     return bookings
-
-def get_all_transfers():
-    return Transfer.objects.all()
-
-def get_all_invoices():
-    return Invoice.objects.all()
 
 def get_user_invoices(user):
     user_bookings = get_user_bookings(user)

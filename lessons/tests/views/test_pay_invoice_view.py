@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
-from lessons.models import Invoice, User, Booking
+from lessons.models import Invoice, User, Booking, Transfer
 from lessons.tests.helpers import reverse_with_next
 from lessons.helpers import calculate_student_balance
 
@@ -121,14 +121,61 @@ class PayInvoiceViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'view_invoice.html')
     
     def test_get_pay_invoice_redirects_if_invoice_not_found(self):
-        self.client.login(username=self.user.username, password='Password123')
+        self.client.login(username=self.admin.username, password='Password123')
         self.url = reverse('pay_invoice', kwargs={'invoice_id': Invoice.objects.count() +1})
         response = self.client.get(self.url, follow=True)
-        redirect_url = reverse('feed')
+        redirect_url = reverse('bookings')
         response = self.client.get(self.url, follow=True)
         self.assertRedirects(response, redirect_url,
             status_code=302, target_status_code=200, fetch_redirect_response=True
         )
-        self.assertTemplateUsed(response, 'feed.html')
+        self.assertTemplateUsed(response, 'bookings.html')
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 1)
+
+    def test_post_pay_invoice_redirects_if_invoice_is_paid(self):
+        self.client.login(username=self.admin.username, password='Password123')
+        self.assertEqual(self.user.balance, -40)
+        form_input = {'amount': '40'}
+
+        response = self.client.post(self.url, form_input, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.invoice = Invoice.objects.get(id=self.booking.pk)
+        self.user = User.objects.get(username='johndoe@example.org')
+        self.assertEqual(self.user.balance, 0)
+        self.assertTrue(self.invoice.is_paid)
+        self.assertIsNotNone(self.invoice.date_paid)
+
+        response = self.client.post(self.url, form_input, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'view_invoice.html')
+    
+    def test_post_pay_invoice_rejects_invalid_form(self):
+        self.client.login(username=self.admin.username, password='Password123')
+        form_input = {'amount': '99.999'}
+        before_count = Transfer.objects.count()
+
+        response = self.client.post(self.url, form_input, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'view_invoice.html')
+        after_count = Transfer.objects.count()
+        self.assertEqual(before_count,after_count)
+    
+    def test_get_pay_invoice_hides_admin_form_when_invoice_paid(self):
+        self.client.login(username=self.admin.username, password='Password123')
+        self.assertEqual(self.user.balance, -40)
+        form_input = {'amount': '40'}
+
+        response = self.client.post(self.url, form_input, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.invoice = Invoice.objects.get(id=self.booking.pk)
+        self.user = User.objects.get(username='johndoe@example.org')
+        self.assertEqual(self.user.balance, 0)
+        self.assertTrue(self.invoice.is_paid)
+        self.assertIsNotNone(self.invoice.date_paid)
+
+        response = self.client.get(self.url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'view_invoice.html')
+        self.assertContains(response, "Paid!")
+        self.assertNotContains(response,'form')
