@@ -22,7 +22,8 @@ class UpdateAdminViewTestCase(TestCase):
             'last_name': 'Pickless',
             'username': 'petra_pickles@example.org',
             'is_director': False,
-            'password': 'Password123'
+            'password': 'Password123',
+            'password_confirmation': 'Password123'
 
         }
 

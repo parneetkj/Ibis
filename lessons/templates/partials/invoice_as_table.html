@@ -16,16 +16,21 @@
             {% if invoice.is_paid %}
                 <div class="alert alert-success" role="alert">
                     <P>Paid!</p>
-                    <p>{{invoice.date_paid}}</p>
+                    {{invoice.date_paid}}
+                </div>
+            {%elif invoice.partial_payment != 0%}
+                <div class="alert alert-warning" role="alert">
+                    <P>Partial Payment</p>
+                    Paid so far: £{{invoice.partial_payment}}
                 </div>
             {%else%}
                 <div class="alert alert-danger" role="alert">
                     Not Paid!
                 </div>
-                {% if user.is_student %}
-                    <a href="{%url 'pay_invoice' invoice.booking.id %}" type="button" class="btn btn-success">Pay Invoice</a>
-                {%endif%}
             {%endif%}
+            <div class="accordion" id="TransfersACC">
+                {% include 'partials/transfers_as_accordion.html' with transfers=transfers %}
+            </div>
         </td>
     </tr>
     <tr>

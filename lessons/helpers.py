@@ -4,35 +4,55 @@ from django.shortcuts import redirect
 from django.utils import timezone
 
 def get_user_requests(user):
-    # To do: Change to user when implemented
     requests = Request.objects.filter(student=user)
     return requests
 
 def get_all_requests():
-    # To do: Change to user when implemented
     requests = Request.objects.filter()
     return requests
 
 def get_user_bookings(user):
-    # To do: Change to user when implemented
     bookings = Booking.objects.filter(student=user)
     return bookings
 
 def get_all_bookings():
-    # To do: Change to user when implemented
     bookings = Booking.objects.filter()
     return bookings
 
-def get_all_transfers():
-    return Transfer.objects.all()
+def get_user_invoices(user):
+    user_bookings = get_user_bookings(user)
+    user_invoices = Invoice.objects.filter(booking__in=user_bookings)
+    return user_invoices
 
-def check_for_refund(booking):
-    invoice = Invoice.objects.get(booking=booking)
-    if invoice.is_paid:
-        booking.student.increase_balance(invoice.total_price)
+def get_user_transfers(user):
+    user_invoices = get_user_invoices(user)
+    user_transfers = Transfer.objects.filter(invoice__in=user_invoices)
+    return user_transfers
+
+def get_invoice_transfers(invoice):
+    return Transfer.objects.filter(invoice=invoice)
+
+def create_transfer(invoice,amount):
+    Transfer.objects.create(invoice=invoice,amount=amount)
+    invoice.add_partial_payment(amount)
+
+def calculate_student_balance(user):
+    user_invoices = get_user_invoices(user)
+
+    total_bill = 0
+    total_paid = 0
+    for invoice in user_invoices:
+        total_bill += invoice.total_price
+        total_paid += invoice.partial_payment
+
+    user.set_balance(round(total_paid-total_bill,2))
 class LogInTester:
     def _is_logged_in(self):
         return '_auth_user_id' in self.client.session.keys()
+
+
+    
+
 
 def login_prohibited(view_function):
     def modified_view_function(request):

@@ -1,21 +1,19 @@
-"""Test case of transfer view"""
 from django.test import TestCase
 from django.urls import reverse
-from lessons.forms import TransferForm
-from lessons.models import User, Transfer, Booking
+from lessons.models import Invoice, User, Booking
 from lessons.tests.helpers import reverse_with_next
+from lessons.forms import SelectStudentForm
+from lessons.helpers import calculate_student_balance
 
 class TransfersViewTestCase(TestCase):
-    """Test case of bookings view"""
+    """Test case of new request view"""
 
     fixtures = [
         'lessons/tests/fixtures/default_user.json',
-        'lessons/tests/fixtures/other_users.json',
         'lessons/tests/fixtures/default_admin.json'
     ]
 
     def setUp(self):
-        self.url = reverse('transfers')
         self.user = User.objects.get(username='johndoe@example.org')
         self.admin = User.objects.get(username='petra.pickles@example.org')
 
@@ -33,48 +31,46 @@ class TransfersViewTestCase(TestCase):
         )
         self.booking.save()
         self.booking.generate_invoice()
-        self.form_input = {'student': self.user.pk, 'amount': '40'}
-    
-    def test_transfers_url(self):
-        self.assertEqual(self.url,'/transfers/')
+        calculate_student_balance(self.user)
+        self.invoice = Invoice.objects.get(booking = self.booking)
+        self.url = reverse('transfers')
+        self.form_input = {'student': self.user.pk}
+
+    def test_transfer_url(self):
+        self.assertEqual(self.url, '/transfers/')
     
     def test_get_transfers(self):
-        self.client.login(username=self.admin.username, password='Password123')
+        self.client.login(username=self.admin.username, password="Password123")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'transfers.html')
+        form = response.context['form']
+        self.assertTrue(isinstance(form, SelectStudentForm))
+        self.assertFalse(form.is_bound)
     
-    def test_get_transfers_blocked_for_students(self):
-        self.client.login(username=self.user.username, password='Password123')
-        redirect_url = reverse('feed')
+    def test_get_transfer_redirects_if_student(self):
+        self.client.login(username=self.user.username, password="Password123")
         response = self.client.get(self.url, follow=True)
-        self.assertRedirects(response, redirect_url,
-            status_code=302, target_status_code=200, fetch_redirect_response=True
-        )
+        redirect_url = reverse('feed')
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'feed.html')
+    
+    def test_valid_student_selection(self):
+        self.client.login(username=self.admin.username, password="Password123")
+        response = self.client.post(self.url, self.form_input)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'student_transfers.html')
+        self.assertContains(response, self.user.balance)
+
+    def test_invalid_student_selection(self):
+        self.form_input['student'] = User.objects.count()+1
+        self.client.login(username=self.admin.username, password="Password123")
+        response = self.client.post(self.url, self.form_input)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'transfers.html')
+        self.assertNotContains(response, self.user.balance)
+        form = response.context['form']
+        self.assertTrue(isinstance(form, SelectStudentForm))
+        self.assertFalse(form.is_bound)
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 1)
-
-    def test_successful_new_transfer(self):
-        self.client.login(username=self.admin.username, password="Password123")
-        before_balance = self.user.balance
-        before_count = Transfer.objects.count()
-        response = self.client.post(self.url, self.form_input, follow=True)
-        after_count = Transfer.objects.count()
-        after_balance = User.objects.get(id=self.user.pk).balance
-        self.assertEqual(after_count, before_count+1)
-        self.assertEqual(after_balance, before_balance+40)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'transfers.html')
-        
-    def test_unsuccessful_new_transfer(self):
-        self.client.login(username=self.admin.username, password="Password123")
-        count_before = Transfer.objects.count()
-        self.form_input['amount'] = '40.94949'
-        response = self.client.post(self.url, self.form_input)
-        count_after = Transfer.objects.count()
-        self.assertEqual(count_after, count_before)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'transfers.html')
-        form = response.context['form']
-        self.assertTrue(isinstance(form, TransferForm))
-        

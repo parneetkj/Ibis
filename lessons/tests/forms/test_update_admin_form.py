@@ -16,7 +16,8 @@ class UpdateAdminFormTestCase(TestCase):
             'first_name': 'Petra',
             'last_name': 'Pickles',
             'username': 'petra.pickles@example.org',
-            'password': 'Password123'
+            'password': 'Password123',
+            'password_confirmation': 'Password123'
 
         }
 
@@ -31,6 +32,7 @@ class UpdateAdminFormTestCase(TestCase):
         self.assertIn('last_name', form.fields)
         self.assertIn('username', form.fields)
         self.assertIn('password', form.fields)
+        self.assertIn('password_confirmation', form.fields)
 
     def test_form_uses_model_validation(self):
         self.form_input['username'] = 'badusername'

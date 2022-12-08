@@ -102,8 +102,19 @@ class SignUpForm(forms.ModelForm):
             password=self.cleaned_data.get('new_password'),
             is_student = True,
 
+
         )
         return user
+
+class TransferForm(forms.Form):
+    amount = forms.DecimalField(
+        label='Amount Paid:',
+        min_value=0,
+        step_size=0.01
+        )
+
+class SelectStudentForm(forms.Form):
+    student = forms.ModelChoiceField(queryset=User.objects.filter(is_student=True))
 
 class CreateAdminForm(forms.ModelForm):
     class Meta:
@@ -111,9 +122,6 @@ class CreateAdminForm(forms.ModelForm):
 
         model = User
         fields = ['first_name', 'last_name', 'username']
-
-
-
 
     new_password = forms.CharField(
         label='Password',
@@ -149,13 +157,6 @@ class CreateAdminForm(forms.ModelForm):
         )
         return user
 
-class TransferForm(forms.Form):
-    student = forms.ModelChoiceField(queryset=User.objects.filter(is_student=True))
-    amount = forms.DecimalField(
-        label='Amount Paid:',
-        min_value=0,
-        step_size=0.01
-        )
 
 class UpdateAdminForm(forms.ModelForm):
 
@@ -173,6 +174,16 @@ class UpdateAdminForm(forms.ModelForm):
                     'character and a number'
             )]
     )
+    password_confirmation = forms.CharField(label='Password confirmation', widget=forms.PasswordInput())
+
+    def clean(self):
+        """Clean the data and generate messages for any errors."""
+
+        super().clean()
+        password = self.cleaned_data.get('password')
+        password_confirmation = self.cleaned_data.get('password_confirmation')
+        if password != password_confirmation:
+            self.add_error('password_confirmation', 'Confirmation does not match password.')
 
     def __init__(self, *args, **kwargs):
         super(UpdateAdminForm, self).__init__(*args, **kwargs)

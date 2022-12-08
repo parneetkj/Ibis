@@ -77,11 +77,11 @@ class DirectorPermissionTestCase(TestCase):
         self.assertTemplateUsed(response, 'feed.html')
 
     def test_director_access_pay_invoice(self):
-        self.url = reverse('pay_invoice', kwargs={'booking_id': self.directorList[0].pk})
+        self.url = reverse('pay_invoice', kwargs={'invoice_id': self.directorList[0].pk})
         self.client.login(username=self.user.username, password='Password123')
-        redirect_url = reverse('feed')
+        redirect_url = reverse('bookings')
         response = self.client.get(self.url, follow=True)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'feed.html')
+        self.assertTemplateUsed(response, 'bookings.html')
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 1)
