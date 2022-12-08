@@ -45,7 +45,7 @@ class BookingForm(forms.ModelForm):
 class LogInForm(forms.Form):
     """Form enabling registered users to log in."""
 
-    username = forms.CharField(label="Username")
+    username = forms.CharField(label="Email")
     password = forms.CharField(label="Password", widget=forms.PasswordInput())
 
     def get_user(self):
@@ -66,7 +66,9 @@ class SignUpForm(forms.ModelForm):
 
         model = User
         fields = ['first_name', 'last_name', 'username']
-
+        labels = {
+            'username': 'Email',
+        }
 
 
     new_password = forms.CharField(
@@ -122,6 +124,9 @@ class CreateAdminForm(forms.ModelForm):
 
         model = User
         fields = ['first_name', 'last_name', 'username']
+        labels = {
+            'username': 'Email',
+        }
 
     new_password = forms.CharField(
         label='Password',
@@ -163,7 +168,9 @@ class UpdateAdminForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'username']
-
+        labels = {
+            'username': 'Email',
+        }
 
     password = forms.CharField(
         label='Password',

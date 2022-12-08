@@ -11,7 +11,7 @@ The members of the team are:
 The project is called `msms` (Music School Management System).  It currently consists of a single app `lessons` where all functionality resides.
 
 ## Deployed version of the application
-The deployed version of the application can be found at *<[https://lecturemonk.pythonanywhere.com/](URL)>*.
+The deployed version of the application can be found at *<[https://lecturemonk.pythonanywhere.com/](https://lecturemonk.pythonanywhere.com/)>*.
 
 ## Installation instructions
 To install the software and use it in your local development environment, you must first set up and activate a local development environment.  From the root of the project:
@@ -49,4 +49,5 @@ $ python3 manage.py test
 ## Sources
 The packages used by this application are specified in `requirements.txt`
 
-*Declare are other sources here.*
+*Declare any other sources here.*
+Home Page Image: Kids Cartoon Png #1064763 License: Personal Use - http://clipart-library.com/clip-art/275-2755675_png-etsy-clip-art-and-school-music-kids.htm

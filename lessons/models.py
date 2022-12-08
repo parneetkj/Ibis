@@ -190,7 +190,11 @@ class Invoice(models.Model):
         if self.partial_payment < self.total_price:
             self.is_paid = False
             self.date_paid = None
+        elif self.partial_payment >= self.total_price:
+            self.is_paid = True
+            self.date_paid = timezone.now()
         self.save()
+
 class Transfer(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     amount = models.DecimalField(blank=False, max_digits=10, decimal_places=2)
