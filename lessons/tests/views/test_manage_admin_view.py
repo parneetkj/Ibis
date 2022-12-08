@@ -35,3 +35,9 @@ class ManageAdminViewTestCase(TestCase):
         list_admins = User.objects.filter(is_admin=True)
         admin_first = list_admins.get(username=admin_user)
         self.assertEqual(admin_user.username, admin_first.username)
+
+    def test_get_show_user_redirects_when_not_allowed(self):
+        self.client.login(username=self.admin.username, password='Password123')
+        redirect_url = reverse('feed')
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
