@@ -91,7 +91,7 @@ class UserModelTestCase(TestCase):
         self.user = User.objects.get(username='johndoe@example.org')
         self.assertEqual(20.55, float(self.user.balance))
         self._assert_user_is_valid()
-    
+
     def test_balance_can_be_negative(self):
         self.user.set_balance(-20.55)
         self.user = User.objects.get(username='johndoe@example.org')

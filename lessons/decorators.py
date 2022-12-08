@@ -10,39 +10,37 @@ def student_required(view_function):
     # redirects to the feed page if not and displays an error message.
 
     def modified_view_function(request, *args, **kwargs):
-        if request.user.is_admin:
+        if request.user.is_student:
+            return view_function(request, *args, **kwargs)
+        else:
             messages.add_message(request, messages.ERROR, "You cannot access this page!")
             return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-        else:
-            return view_function(request, *args, **kwargs)
     return modified_view_function
 
 
-   
-def admin_required(view_function): 
-    # Decorator for views that checks that the logged in user is an admin,
+
+def admin_required(view_function):
+    # Decorator for views that checks that the logged in user is an admin or a director,
     # redirects to the feed page if not.
 
     def modified_view_function(request, *args, **kwargs):
-        if request.user.is_student:
+        if request.user.is_admin or request.user.is_director:
+            return view_function(request, *args, **kwargs)
+        else:
             messages.add_message(request, messages.ERROR, "You cannot access this page!")
             return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-        else:
-            return view_function(request, *args, **kwargs)
     return modified_view_function
 
 
-def director_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url='log_in'):
+def director_required(view_function):
 
-    # Decorator for views that checks that the logged in user is an admin,
-    # redirects to the log-in page if not.
+    # Decorator for views that checks that the logged in user is a director,
+    # redirects to the feed page if not and displays an error message.
 
-
-    actual_decorator = user_passes_test(
-        lambda u: u.is_active and u.is_director,
-        login_url=login_url,
-        redirect_field_name=redirect_field_name
-    )
-    if function:
-        return actual_decorator(function)
-    return actual_decorator
+    def modified_view_function(request, *args, **kwargs):
+        if request.user.is_director:
+            return view_function(request, *args, **kwargs)
+        else:
+            messages.add_message(request, messages.ERROR, "You cannot access this page!")
+            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+    return modified_view_function

@@ -29,7 +29,7 @@ class Request(models.Model):
     """Requests by students"""
 
     student = models.ForeignKey(User, on_delete=models.CASCADE)
-    
+
     date = models.DateField(
         blank=False,
     )
@@ -161,7 +161,7 @@ class Booking(models.Model):
         max_digits=10,
         decimal_places=2
     )
-    
+
     def generate_invoice(self):
         Invoice.objects.create(booking=self, total_price=self.get_price,date_paid=None)
 
@@ -195,4 +195,3 @@ class Transfer(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     amount = models.DecimalField(blank=False, max_digits=10, decimal_places=2)
     date = models.DateTimeField(auto_now_add=True, blank=False)
-
