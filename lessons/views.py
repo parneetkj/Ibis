@@ -333,9 +333,9 @@ def manage_admin(request):
 
 @login_required
 @director_required
-def delete_admin(request, email):
-    if(User.objects.filter(username = email)):
-        User.objects.filter(username = email).delete()
+def delete_admin(request, name):
+    if(User.objects.filter(username = name)):
+        User.objects.filter(username = name).delete()
         messages.add_message(request, messages.SUCCESS, "Admin deleted!")
         return redirect('manage_admin')
     else:

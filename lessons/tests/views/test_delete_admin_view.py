@@ -12,7 +12,7 @@ class DeleteAdminViewTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.get(username='bobdoe@example.org')
         self.admin = User.objects.get(username='petra.pickles@example.org')
-        self.url = reverse('delete_admin', kwargs={'email': self.admin.username})
+        self.url = reverse('delete_admin', kwargs={'name': self.admin.username})
 
     def test_get_delete_admin_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('log_in', self.url)
@@ -34,7 +34,7 @@ class DeleteAdminViewTestCase(TestCase):
         self.client.login(username=self.user.username, password='Password123')
         before_count = User.objects.filter(is_admin=True).count()
         email_admin = User.objects.get(username=self.admin.username)
-        delete_admin_url = reverse('delete_admin', kwargs={'email':email_admin})
+        delete_admin_url = reverse('delete_admin', kwargs={'name':email_admin})
         redirect_url = reverse('manage_admin')
         response = self.client.get(delete_admin_url, follow = True)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200, fetch_redirect_response=True)
@@ -45,7 +45,7 @@ class DeleteAdminViewTestCase(TestCase):
 
     def test_delete_admin_redirects_if_not_found(self):
         self.client.login(username=self.user.username, password='Password123')
-        delete_admin_url = reverse('delete_admin', kwargs={'email': 'peterdoe@example.org'})
+        delete_admin_url = reverse('delete_admin', kwargs={'name': 'peterdoe@example.org'})
         redirect_url = reverse('manage_admin')
         response = self.client.get(delete_admin_url, follow=True)
         self.assertRedirects(response, redirect_url,
