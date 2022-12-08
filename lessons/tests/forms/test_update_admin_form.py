@@ -39,6 +39,11 @@ class UpdateAdminFormTestCase(TestCase):
         form = UpdateAdminForm(instance=self.admin, data=self.form_input)
         self.assertFalse(form.is_valid())
 
+    def test_password_and_password_confirmation_are_identical(self):
+        self.form_input['password_confirmation'] = 'WrongPassword123'
+        form = UpdateAdminForm(data=self.form_input)
+        self.assertFalse(form.is_valid())
+
     def test_form_must_save_correctly(self):
         form = UpdateAdminForm(instance=self.admin, data=self.form_input)
         before_count = User.objects.count()
