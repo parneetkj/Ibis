@@ -2,10 +2,10 @@
 
 ## Team members
 The members of the team are:
-- *<William Lingard>*
-- *<Mathew Tran>*
-- *<Janet Thomas>*
-- *<Parneet Johal>*
+- William Lingard
+- Mathew Tran
+- Janet Thomas
+- Parneet Johal
 
 ## Project structure
 The project is called `msms` (Music School Management System).  It currently consists of a single app `lessons` where all functionality resides.
