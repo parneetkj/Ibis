@@ -283,7 +283,7 @@ def view_invoice(request, booking_id):
                 return render(request, 'view_invoice.html', {'invoice' : invoice, 'transfers':transfers})
         else:
              return render(request, 'view_invoice.html', {'invoice' : invoice, 'transfers':transfers})
-             
+
 @login_required
 def transfers(request):
     if (request.user.is_student):
@@ -349,7 +349,11 @@ def pay_invoice(request, invoice_id):
 @login_required
 @director_required
 def manage_admin(request):
-    admin_list = User.objects.filter(is_admin=True).filter(is_director=False)
+    try:
+        admin_list = User.objects.filter(is_admin=True).filter(is_director=False)
+    except:
+        messages.add_message(request, messages.ERROR, "Sorry, you don't have access to this page!")
+        return redirect('feed')
     return render(request, 'manage_admin.html', {'admin_list': admin_list})
 
 @login_required
