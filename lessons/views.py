@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from .models import Request, Booking, Invoice, Transfer, User
 from .helpers import get_user_requests, get_all_requests, get_user_bookings, get_all_bookings, get_user_transfers, create_transfer, get_user_invoices, calculate_student_balance, get_invoice_transfers
 from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm, LogInForm, RequestForm, BookingForm, TransferForm, SelectStudentForm
+from .forms import SignUpForm, LogInForm, RequestForm, BookingForm, TransferForm, SelectStudentForm, CreateAdminForm, UpdateAdminForm
 from django.contrib.auth import login, logout
 from .decorators import student_required, director_required, admin_required
 from django.contrib import messages
@@ -171,7 +171,7 @@ def pending_requests(request):
     else:
         requests = get_all_requests()
     return render(request, 'pending_requests.html', {'requests' : requests})
-    
+
 
 @login_required
 @admin_required
@@ -225,7 +225,7 @@ def update_booking(request, id):
     except:
         messages.add_message(request, messages.ERROR, "Booking could not be found!")
         return redirect('bookings')
-        
+
     if request.method == 'POST':
         form = BookingForm(instance = booking_request, data = request.POST)
         if (form.is_valid()):
@@ -246,17 +246,17 @@ def delete_booking(request, id):
     try:
         booking = Booking.objects.get(pk=id)
     except:
-        messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")    
+        messages.add_message(request, messages.ERROR, "Sorry, an error occurred deleting your request.")
         return redirect('bookings')
-   
+
     student = booking.student
     booking.delete()
     calculate_student_balance(student)
     messages.add_message(request, messages.SUCCESS, "Booking deleted!")
     return redirect('bookings')
 
-        
-        
+
+
 def log_out(request):
     logout(request)
     return redirect('home_page')
@@ -283,6 +283,7 @@ def view_invoice(request, booking_id):
                 return render(request, 'view_invoice.html', {'invoice' : invoice, 'transfers':transfers})
         else:
              return render(request, 'view_invoice.html', {'invoice' : invoice, 'transfers':transfers})
+             
 @login_required
 def transfers(request):
     if (request.user.is_student):
@@ -291,12 +292,12 @@ def transfers(request):
         form = SelectStudentForm(request.POST)
         if form.is_valid():
             student = User.objects.get(id=form.cleaned_data.get('student').pk)
-            return student_transfers(request,student.pk)  
+            return student_transfers(request,student.pk)
         else:
             form = SelectStudentForm()
             messages.add_message(request, messages.ERROR, "Sorry, could not find this student!")
             return render(request, 'transfers.html', {'form' : form})
-            
+
     else:
         form = SelectStudentForm()
         return render(request, 'transfers.html', {'form' : form})
@@ -321,7 +322,7 @@ def pay_invoice(request, invoice_id):
     except:
         messages.add_message(request, messages.ERROR, "Sorry, could not locate the invoice!")
         return redirect('bookings')
-        
+
     if request.method == 'POST':
         form = TransferForm(request.POST)
         if form.is_valid():
@@ -330,9 +331,9 @@ def pay_invoice(request, invoice_id):
 
             create_transfer(invoice, form.cleaned_data.get('amount'))
             invoice.check_if_paid()
-            calculate_student_balance(invoice.booking.student) 
+            calculate_student_balance(invoice.booking.student)
             messages.add_message(request, messages.SUCCESS, "Transfer added!")
-        
+
         invoice = Invoice.objects.get(id=invoice_id)
         form = TransferForm()
         transfers = get_invoice_transfers(invoice)
@@ -344,3 +345,75 @@ def pay_invoice(request, invoice_id):
         else:
             form = TransferForm()
             return render(request, 'view_invoice.html', {'invoice' : invoice, 'form':form,'transfers':transfers})
+
+@login_required
+@director_required
+def manage_admin(request):
+    admin_list = User.objects.filter(is_admin=True).filter(is_director=False)
+    return render(request, 'manage_admin.html', {'admin_list': admin_list})
+
+@login_required
+@director_required
+def delete_admin(request, name):
+    if(User.objects.filter(username = name)):
+        User.objects.filter(username = name).delete()
+        messages.add_message(request, messages.SUCCESS, "Admin deleted!")
+        return redirect('manage_admin')
+    else:
+        messages.add_message(request, messages.ERROR, "Couldn't delete admin")
+        return redirect('manage_admin')
+
+@login_required
+@director_required
+def create_admin(request):
+    if request.method == 'POST':
+        form = CreateAdminForm(request.POST)
+        if form.is_valid():
+            messages.add_message(request, messages.SUCCESS, "Admin created!")
+            form.save()
+            return redirect('manage_admin')
+    else:
+        form = CreateAdminForm()
+    return render(request, 'create_admin.html', {'form': form})
+
+@login_required
+@director_required
+def update_admin(request, pk):
+    try:
+        admin_update = User.objects.get(id=pk)
+    except:
+        messages.add_message(request, messages.ERROR, "Admin could not be found!")
+        return redirect('manage_admin')
+
+    if request.method == 'POST':
+        form = UpdateAdminForm(request.POST, instance=admin_update)
+        if form.is_valid():
+            messages.add_message(request, messages.SUCCESS, "Admin updated!")
+            admin_update = form.save(commit=False)
+            admin_update.set_password(form.cleaned_data['password'])
+            admin_update.save()
+            return redirect('manage_admin')
+        else:
+            messages.add_message(request, messages.INFO, "Error!")
+            return render(request, 'update_admin.html', {'form': form})
+    else:
+        form = UpdateAdminForm(instance=admin_update)
+
+    return render(request, 'update_admin.html', {"form": form})
+
+@login_required
+@director_required
+def promote_admin(request, pk):
+    try:
+        admin_promote = User.objects.get(id=pk)
+    except:
+        messages.add_message(request, messages.ERROR, "Admin could not be found!")
+        return redirect('manage_admin')
+    try:
+        admin_promote.is_director = True
+        admin_promote.save()
+        messages.add_message(request, messages.SUCCESS, "Admin is Assigned Director Status!")
+        return redirect('manage_admin')
+    except:
+        messages.add_message(request, messages.ERROR, "Couldn't promote admin!")
+        return redirect('manage_admin')

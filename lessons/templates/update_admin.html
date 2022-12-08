@@ -1,0 +1,21 @@
+{% extends 'base_content.html' %}
+{% load widget_tweaks}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Edit Request</h1>
+
+        <form action="" method="post">
+          {% csrf_token %}
+          <table>
+            {% include 'partials/bootstrap_form.html' with form=form %}
+          </table>
+          <a href="{%url 'manage_admin'%}" type="button" class="btn btn-secondary">Back</a>
+          <input type="submit" value="Submit" class="btn btn-primary">
+        </form>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

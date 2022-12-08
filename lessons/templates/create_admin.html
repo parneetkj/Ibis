@@ -1,0 +1,20 @@
+{% extends 'base_content.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Create Admin</h1>
+      <form action="{% url 'create_admin' %}" method="post">
+        {% csrf_token %}
+
+        {% include 'partials/bootstrap_form.html' with form=form %}
+  
+
+        <a href="{%url 'manage_admin'%}" type="button" class="btn btn-secondary">Back</a>
+        <input type="submit" value="Create" class="btn btn-primary">
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
