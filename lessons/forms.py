@@ -88,8 +88,6 @@ class SignUpForm(forms.ModelForm):
         password_confirmation = self.cleaned_data.get('password_confirmation')
         if new_password != password_confirmation:
             self.add_error('password_confirmation', 'Confirmation does not match password.')
-        username = self.cleaned_data.get('username')
-
 
     def save(self):
         """Create a new user."""
