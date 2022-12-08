@@ -16,7 +16,6 @@ class UpdateAdminFormTestCase(TestCase):
             'first_name': 'Petra',
             'last_name': 'Pickles',
             'username': 'petra.pickles@example.org',
-            'is_director': False,
             'password': 'Password123'
 
         }
@@ -31,7 +30,6 @@ class UpdateAdminFormTestCase(TestCase):
         self.assertIn('first_name', form.fields)
         self.assertIn('last_name', form.fields)
         self.assertIn('username', form.fields)
-        self.assertIn('is_director', form.fields)
         self.assertIn('password', form.fields)
 
     def test_form_uses_model_validation(self):
@@ -48,6 +46,5 @@ class UpdateAdminFormTestCase(TestCase):
         user = User.objects.get(username='petra.pickles@example.org')
         self.assertEqual(user.first_name, 'Petra')
         self.assertEqual(user.last_name, 'Pickles')
-        self.assertEqual(user.is_director, False)
         is_password_correct = check_password('Password123', user.password)
         self.assertTrue(is_password_correct)

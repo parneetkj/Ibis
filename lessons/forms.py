@@ -17,7 +17,7 @@ class RequestForm(forms.ModelForm):
             'amount': ('Number of lessons:'),
             'interval': ('Number of weeks between lessons'),
         }
-        
+
 
     """Override clean method to check date and time"""
     def clean(self):
@@ -110,7 +110,7 @@ class CreateAdminForm(forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'is_director']
+        fields = ['first_name', 'last_name', 'username']
 
 
 
@@ -144,7 +144,6 @@ class CreateAdminForm(forms.ModelForm):
             first_name=self.cleaned_data.get('first_name'),
             last_name=self.cleaned_data.get('last_name'),
             password=self.cleaned_data.get('new_password'),
-            is_director=self.cleaned_data.get('is_director'),
             is_admin = True,
 
         )
@@ -162,9 +161,9 @@ class UpdateAdminForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username','is_director']
+        fields = ['first_name', 'last_name', 'username']
 
-        
+
     password = forms.CharField(
         label='Password',
         widget=forms.PasswordInput(),

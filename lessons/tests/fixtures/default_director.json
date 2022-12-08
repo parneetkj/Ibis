@@ -8,6 +8,7 @@
       "username":"bobdoe@example.org",
       "password":"pbkdf2_sha256$390000$A1PQCaBdlC7ymIN4XHnwVr$3j6nPfqgSK09oleD38FNf4s32SSUkgUg+h6Mh5K4ygQ=",
       "is_active": true,
+      "is_admin": true,
       "is_director": true
     }
   }

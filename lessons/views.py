@@ -1,11 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
 from .models import Request, Booking, Invoice, Transfer, User
-<<<<<<< HEAD
-from .helpers import get_user_requests, get_all_requests, get_user_bookings, get_all_bookings, get_all_transfers, adjust_student_balance, check_for_refund
-=======
 from .helpers import get_user_requests, get_all_requests, get_user_bookings, get_all_bookings, get_all_transfers, check_for_refund
->>>>>>> main
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm, RequestForm, BookingForm, TransferForm, CreateAdminForm, UpdateAdminForm
 from django.contrib.auth import login, logout
@@ -332,7 +328,7 @@ def pay_invoice(request, booking_id):
 @login_required
 @director_required
 def manage_admin(request):
-    admin_list = User.objects.filter(is_admin=True)
+    admin_list = User.objects.filter(is_admin=True).filter(is_director=False)
     return render(request, 'manage_admin.html', {'admin_list': admin_list})
 
 @login_required
@@ -383,3 +379,20 @@ def update_admin(request, pk):
         form = UpdateAdminForm(instance=admin_update)
 
     return render(request, 'update_admin.html', {"form": form})
+
+@login_required
+@director_required
+def promote_admin(request, pk):
+    try:
+        admin_promote = User.objects.get(id=pk)
+    except:
+        messages.add_message(request, messages.ERROR, "Admin could not be found!")
+        return redirect('manage_admin')
+    try:
+        admin_promote.is_director = True
+        admin_promote.save()
+        messages.add_message(request, messages.SUCCESS, "Admin is Assigned Director Status!")
+        return redirect('manage_admin')
+    except:
+        messages.add_message(request, messages.ERROR, "Couldn't promote admin!")
+        return redirect('manage_admin')

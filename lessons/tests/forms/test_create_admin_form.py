@@ -11,7 +11,6 @@ class CreateAdminFormTestCase(TestCase):
             'first_name': 'Peter',
             'last_name': 'Doe',
             'username': 'peterdoe@example.org',
-            'is_director': True,
             'new_password': 'Password123',
             'password_confirmation': 'Password123'
         }
@@ -26,7 +25,6 @@ class CreateAdminFormTestCase(TestCase):
         self.assertIn('last_name', form.fields)
         self.assertIn('username', form.fields)
         self.assertIn('new_password', form.fields)
-        self.assertIn('is_director', form.fields)
         new_password_widget = form.fields['new_password'].widget
         self.assertTrue(isinstance(new_password_widget, forms.PasswordInput))
         self.assertIn('password_confirmation', form.fields)
@@ -70,6 +68,5 @@ class CreateAdminFormTestCase(TestCase):
         user = User.objects.get(username='peterdoe@example.org')
         self.assertEqual(user.first_name, 'Peter')
         self.assertEqual(user.last_name, 'Doe')
-        self.assertEqual(user.is_director, True)
         is_password_correct = check_password('Password123', user.password)
         self.assertTrue(is_password_correct)

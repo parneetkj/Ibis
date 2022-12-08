@@ -18,7 +18,6 @@ class TestNewAdminViewTestCase(TestCase):
             'first_name': 'Peter',
             'last_name': 'Doe',
             'username': 'peterdoe@example.org',
-            'is_director': True,
             'new_password': 'Password123',
             'password_confirmation': 'Password123'
         }
@@ -67,7 +66,6 @@ class TestNewAdminViewTestCase(TestCase):
         user = User.objects.get(username='peterdoe@example.org')
         self.assertEqual(user.first_name, 'Peter')
         self.assertEqual(user.last_name, 'Doe')
-        self.assertEqual(user.is_director, True)
         self.assertEqual(user.is_admin, True)
         is_password_correct = check_password('Password123', user.password)
         self.assertTrue(is_password_correct)

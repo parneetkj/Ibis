@@ -1,5 +1,5 @@
 from lessons.models import User
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.test import RequestFactory
 from lessons.decorators import student_required
 from django.http import HttpResponse
@@ -32,7 +32,7 @@ class StudentRequiredTestCase(TestCase):
         @student_required
         def a_view(request):
             return HttpResponse()
-        request = self.factory.get('/pending_request')
+        request = self.factory.get('/new_request')
         request.user = self.admin
         middleware = SessionMiddleware(request)
         middleware.process_request(request)

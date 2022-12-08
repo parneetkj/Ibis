@@ -8,8 +8,8 @@
       <form action="{% url 'create_admin' %}" method="post">
         {% csrf_token %}
 
-        <!--{% include 'partials/bootstrap_form.html' with form=form %}-->
-        {{form.as_p}}
+        {% include 'partials/bootstrap_form.html' with form=form %}
+  
 
         <a href="{%url 'manage_admin'%}" type="button" class="btn btn-secondary">Back</a>
         <input type="submit" value="Create" class="btn btn-primary">
